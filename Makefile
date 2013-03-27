@@ -50,7 +50,7 @@ deps: get-deps
 MAIN_ERLS = $(shell find src -name '*.erl' -not -name '*tests.erl')
 
 DIALYZER ?= dialyzer
-DIALYZER_FLAGS ?= -Wno_opaque
+DIALYZER_FLAGS ?=
 
 CT_RUN ?= ct_run
 CT_FLAGS = -pa $(TEST_APP)/ebin -pa $(DEPS)/*/ebin

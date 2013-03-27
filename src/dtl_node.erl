@@ -92,7 +92,7 @@ set_state(Node, State) -> Node#unode{state = State}.
 state(Node) -> Node#unode.state.
 
 %% @doc Set a node's child nodes.
--spec set_nodelist(unode, [tnode()]) -> unode().
+-spec set_nodelist(unode(), [tnode()]) -> unode().
 set_nodelist(Node, Nodes) -> Node#unode{nodelist = Nodes}.
 
 %% @doc Get a node's child nodes.
@@ -122,7 +122,8 @@ render_list([Node|NodeList], Ctx, Bits) ->
 render_list([], Ctx, Bits) -> {lists:reverse(Bits), Ctx}.
 
 %% @doc Renders a single node.
--spec render(tnode(), dtl_context:context()) -> binary().
+-spec render(tnode(), dtl_context:context()) ->
+    binary() | {binary(), dtl_context:context()}.
 render(Node = #unode{renderer = {M, F}}, Ctx) ->
     M:F(Node, Ctx);
 render(Node = #unode{renderer = Fun}, Ctx) ->

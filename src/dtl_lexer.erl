@@ -79,7 +79,8 @@ tokenize_bits([Bit|Bits], Tokens, InTag, Verbatim) ->
 tokenize_bits([], Tokens, _InTag, _Verbatim) -> lists:reverse(Tokens).
 
 %% Token factory.
--spec make_token(binary(), boolean(), boolean()) -> token().
+-spec make_token(binary(), boolean(), boolean()) ->
+    {token(), Verbatim :: boolean()}.
 %% Check for {% endverbatim %} if in {% verbatim %}.
 make_token(Src = <<?BLOCK_TAG_START, Rest/binary>>, true, true) ->
     Stripped = strip_token(Rest),

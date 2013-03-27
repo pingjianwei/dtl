@@ -86,8 +86,9 @@ parse(Token, Parser) ->
           filters = Filters}.
 
 -spec process_matches([list(binary())], term(), [filter()],
-        dtl_parser:parser()) ->
-    {term(), [filter()]} | {error, {unknown_filter, atom()}}.
+                      dtl_parser:parser()) ->
+    {term(), [filter()]} | {error, {unknown_filter, atom()}
+                                 | no_variable}.
 %% First match must contain a variable or constant.
 process_matches([[<<>>, <<>>, _, _, _]|_], undefined, _, _) ->
     {error, no_variable};
@@ -113,8 +114,7 @@ process_matches([[_, _, RawName, ConstArg, VarArg]|Matches], Var,
                         {Const, <<>>} -> [{false, process_string(Const)}];
                         {<<>>, Var2} ->
                             Var3 = process_var(Var2),
-                            Lookup = is_list(Var3),
-                            {Lookup, Var3}
+                            [{is_list(Var3), Var2}]
                     end,
                     Filter = {FilterFun, Args},
                     process_matches(Matches, Var, [Filter|Filters], Parser)

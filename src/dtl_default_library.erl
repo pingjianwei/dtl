@@ -36,7 +36,7 @@
     first :: if_cond_token(),
     second :: if_cond_token(),
     lbp = 0 :: integer(),
-    text :: list(),
+    text :: binary(),
     id :: binary()
 }).
 
@@ -44,7 +44,7 @@
 -type block_spec() :: {Name :: list(),
                        Node :: dtl_node:unode()}.
 -type if_cond_token() :: #if_cond_token{}.
--type if_cond_type() :: infix | prefix | literal.
+-type if_cond_type() :: infix | prefix | literal | ending.
 
 -export([registered_tags/0,
          registered_filters/0]).
@@ -152,7 +152,7 @@ upper(Bin) ->
 %%
 
 %% @doc Create or override a named section of a template.
--spec block(dtl_parser:parser(), dtl_lexer:token()) ->
+-spec block(dtl_parser:parser(), binary()) ->
     {ok, dtl_node:unode(), dtl_parser:parser()}
         | {error, {badarg, block_tag}
                 | {block_redefined, binary()}}.
@@ -176,7 +176,7 @@ block(Parser, Token) ->
     end.
 
 -spec render_block(dtl_node:unode(), dtl_context:context()) ->
-    {binary(), dtl_context:context()}.
+    {[binary()], dtl_context:context()}.
 render_block(Node, Ctx) ->
     Ctx2 = dtl_context:push(Ctx),
     RenderCtx = dtl_context:render_context(Ctx2),
@@ -214,7 +214,7 @@ render_block(Node, Ctx) ->
 %% @doc Inherit one template from another. Child template must define
 %%      all content in {% block Name %} tags, which will override any block
 %%      with the same name in parent templates.
--spec extends(dtl_parser:parser(), dtl_lexer:token()) ->
+-spec extends(dtl_parser:parser(), binary()) ->
     {ok, dtl_node:unode(), dtl_parser:parser()}
         | {error, {template_not_found, binary()}
                 | {badarg, extends_tag}
@@ -315,7 +315,7 @@ add_blocks(BlockCtx, []) -> BlockCtx.
 
 %% @doc Loads tag: `{% load library_name %}' where `library_name' is a
 %%      module implementing the `dtl_library' interface.
--spec load(dtl_parser:parser(), dtl_lexer:token()) ->
+-spec load(dtl_parser:parser(), binary()) ->
     {ok, dtl_node:unode(), dtl_parser:parser()}
         | {error, {missing_library, binary()} | load_tag_syntax_error}.
 load(Parser, Token) ->
@@ -361,7 +361,7 @@ comment(Parser, _Token) ->
     Node3 = dtl_node:set_nodelist(Node2, [N || {_Cond, Ns} <- CondBodies2, N <- Ns]),
     {ok, Node3, Parser4}.
 
-if_elif_else(Token = {_, <<"elif", _/binary>>}, Parser, CondBodies) ->
+if_elif_else({_, Token = <<"elif", _/binary>>}, Parser, CondBodies) ->
     [_Cmd|Bits] = dtl_parser:split_token(Token),
     Cond = parse_if(Parser, Bits),
     {ok, Nodes, Parser2} = dtl_parser:parse(Parser, [elif, else, endif]),
@@ -394,7 +394,7 @@ mapped_tokens([T|Ts], Mapped, Parser) ->
 mapped_tokens([], Mapped, _Parser) ->
     lists:reverse(Mapped).
 
--spec if_token(dtl_lexer:token(), dtl_parser:parser()) ->
+-spec if_token(binary(), dtl_parser:parser()) ->
     if_cond_token().
 if_token(V, Parser) ->
     case proplists:get_value(V, ?IF_OPERATORS) of
@@ -671,7 +671,7 @@ ifchanged(Parser, Token) ->
             {[], Parser4}
     end,
     Nodes = [N || NL <- [TrueNodes, FalseNodes], N <- NL],
-    Values = [dtl_filter:parse(Bit) || Bit <- Bits],
+    Values = [dtl_filter:parse(Bit, Parser) || Bit <- Bits],
     Node = dtl_node:new("ifchanged", {?MODULE, render_ifchanged}),
     Node2 = dtl_node:set_nodelist(Node, Nodes),
     Node3 = dtl_node:set_state(Node2, {make_ref(), Values, TrueNodes,

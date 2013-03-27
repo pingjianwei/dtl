@@ -84,7 +84,7 @@ parse(Parser = #parser{tokens = Tokens}, Until) ->
     parse_until(Parser, Tokens, Until, []).
 
 -spec parse_until(parser(), [dtl_lexer:token()], [atom()],
-       [dtl_node:tnode()]) -> {ok, dtl_node:tnodelist(), parser()}
+       [dtl_node:tnode()]) -> {ok, [dtl_node:tnode()], parser()}
                                | {error, empty_block_tag
                                        | {unknown_tag, atom()}
                                        | unclosed_block_tag}.
@@ -156,7 +156,7 @@ split_token(Src) ->
 %% @doc Searches the parser's filter collection for a filter with the
 %%      provided name.
 -spec find_filter(parser(), dtl_library:name()) ->
-    dtl_filter:filter_fun() | nomatch.
+    {ok, dtl_filter:filter_fun()} | nomatch.
 find_filter(#parser{filters = Filters}, Name) ->
     dtl_library:search_collection(Filters, Name).
 

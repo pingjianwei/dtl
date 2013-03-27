@@ -35,15 +35,14 @@
          run/3]).
 -export_type([tag/0]).
 
--spec run(tag(), dtl_parser:parser(), dtl_lexer:token()) ->
+-spec run(tag(), dtl_parser:parser(), binary()) ->
     {ok, dtl_node:tnode(), dtl_parser:parser()} | {error, atom()}.
 run({{WrapMod, WrapFun, Arg}, {Mod, Fun}}, Parser, Token) ->
     WrapMod:WrapFun(Arg, Mod, Fun, Parser, Token);
 run({Mod, Fun}, Parser, Token) ->
     Mod:Fun(Parser, Token).
 
--spec inclusion_tag(list(), module(), atom(), dtl_parser:parser(),
-        dtl_lexer:token()) ->
+-spec inclusion_tag(list(), module(), atom(), dtl_parser:parser(), binary()) ->
     {ok, dtl_node:tnode(), dtl_parser:parser()}.
 inclusion_tag(Name, Mod, Fun, Parser, Token) ->
     %% TODO: Break up the token into args/options correctly.
@@ -60,7 +59,7 @@ inclusion_tag(Name, Mod, Fun, Parser, Token) ->
     {ok, Node3, Parser}.
 
 -spec render_inclusion_tag(dtl_node:tnode(), dtl_context:context()) ->
-    binary().
+    {[binary()], dtl_context:context()}.
 render_inclusion_tag(Node, Ctx) ->
     {Mod, Fun, Args, Opts} = dtl_node:state(Node),
     RealArgs = [dtl_filter:resolve_expr(A, Ctx) || A <- Args],

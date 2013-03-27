@@ -50,7 +50,8 @@
 -record(ctx, {
     stack = [] :: [dict()],
     autoescape = true :: boolean(),
-    render_context :: dtl_context:context()
+    render_context %% :: context() -- Dialyzer does not handle this
+                   %%                 specification properly.
 }).
 
 -opaque context() :: #ctx{}.
@@ -65,13 +66,8 @@ new() -> new([]).
 %% Identity function when provided as context.
 new(Ctx) when is_record(Ctx, ctx) -> Ctx;
 new(PList) when is_list(PList) ->
-    Ctx = new_base(),
-    Ctx2 = Ctx#ctx{render_context = new_base()},
-    update(process_all(Ctx2), PList).
-
-%% Internal function to return a common context base.
--spec new_base() -> context().
-new_base() -> #ctx{}.
+    Ctx = #ctx{render_context = #ctx{}},
+    update(process_all(Ctx), PList).
 
 %% TODO: Support some initial state (Django provides an HTTP request
 %%       object to each processor).
@@ -127,13 +123,13 @@ update(Ctx, PList) ->
     set(push(Ctx), PList).
 
 %% @doc Looks up a value on all context stacks, in top-to-bottom order.
--spec fetch(context(), term()) -> {ok, term()} | undefined.
+-spec fetch(context(), term()) -> term() | undefined.
 fetch(#ctx{stack = []}, _K) -> undefined;
 fetch(#ctx{stack = Stack}, K) -> fetch_stack(Stack, K).
 
 %% Fetches a value from the context stack, trying each in order from
 %% bottom to top.
--spec fetch_stack(list(), term()) -> {ok, term()} | undefined.
+-spec fetch_stack(list(), term()) -> term() | undefined.
 fetch_stack([Head|Stack], K) ->
     case dict:find(K, Head) of
         error -> fetch_stack(Stack, K);
@@ -171,11 +167,11 @@ render_fetch(Ctx, K, Def) ->
     end.
 
 %% @doc Return the template rendering context from the provided context.
--spec render_context(context()) -> context().
+-spec render_context(context()) -> context() | undefined.
 render_context(#ctx{render_context = RenderCtx}) ->
     RenderCtx.
 
 %% @doc Sets the template rendering on the provided context.
--spec set_render_context(context(), context()) -> context().
+-spec set_render_context(context(), context() | undefined) -> context().
 set_render_context(Ctx, RenderCtx) ->
     Ctx#ctx{render_context = RenderCtx}.
