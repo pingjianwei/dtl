@@ -24,9 +24,12 @@
 #
 # Targets:
 #     all (dtl): Compile DTL's erlang sources.
-#     check (test): Run DTL's test suite.
+#     check (test, ct): Run DTL's test suite.
 #     deps: Install all dependencies (requires `rebar').
-#     dialyze: Run Dialyze over the codebase.
+#     doc: Build EDoc.
+#     dialyze (dia): Run Dialyzer over the codebase, checking types and
+#         things.
+#     get-deps: Only download dependencies, don't build them.
 #     plt: Build files necessary for running `dialyze'.
 #
 # Options:
@@ -39,7 +42,7 @@ PROGRAM = dtl
 REBAR ?= rebar
 DEPS = deps
 
-all: program
+all: dtl
 
 get-deps: rebar.config
 	$(REBAR) get-deps
@@ -58,30 +61,36 @@ CT_SUITES = eunit_SUITE
 
 TEST_APP = test/eunit_SUITE_data/test_app
 
-program:
+dtl:
 	$(REBAR) compile skip_deps=true
 
-clean: ct-clean doc-clean
+clean: check-clean doc-clean
 	$(REBAR) clean skip_deps=true
 	$(MAKE) -C $(TEST_APP) clean
 
-ct-clean:
-	rm -rf logs
-
-doc-clean:
-	rm -rf doc
-
-check: ct
-
-ct: ct-clean program
+check: check-clean dtl
 	$(MAKE) -C $(TEST_APP)
 	mkdir -p logs
 	$(CT_RUN) $(EFLAGS) $(CT_FLAGS) -pa ebin \
-		-I include -dir test -logdir logs -suite $(CT_SUITES)
+		-I include -dir test -logdir logs -suite $(CT_SUITES) \
+		|| ( f="$$(find logs -name eunit_suite.eunit.html | head -1)" ; \
+	if [[ -n "$$f" ]] ; then \
+		[[ "$$(uname)" = Darwin ]] \
+			&& open -aFirefox "$$f" \
+			|| firefox -new-window "file://$$PWD/$$f" ; \
+	fi )
+ct: check
+test: check
+
+check-clean:
+	rm -rf logs
 
 doc:
 	mkdir -p doc
 	./edoc.escript
+
+doc-clean:
+	rm -rf doc
 
 plt:
 	$(DIALYZER) --build_plt --output_plt .$(PROGRAM).plt \
@@ -90,5 +99,7 @@ plt:
 dialyze:
 	$(DIALYZER) $(DIALYZER_FLAGS) --apps $(DEPS)/*/ebin \
 		--src $(MAIN_ERLS) --plt .$(PROGRAM).plt --no_native
+dia: dialyze
 
-.PHONY: clean clean-pre ct-clean doc-clean check ct ct-pre doc
+.PHONY: all dtl clean check ct test check-clean doc doc-clean plt \
+	dialyze dia
