@@ -203,10 +203,10 @@ https://docs.djangoproject.com/en/dev/ref/templates/builtins/
 
 Name|Implemented
 ---|---
-`autoescape`|No
+`autoescape`|Yes
 `block`|Yes
 `comment`|Yes
-`csrf_token`|No
+`csrf_token`|Won't support
 `cycle`|No
 `debug`|No
 `extends`|Yes
@@ -225,7 +225,7 @@ Name|Implemented
 `spaceless`|No
 `ssi`|No
 `templatetag`|No
-`url`|No
+`url`|Won't support
 `verbatim`|Yes
 `widthratio`|No
 `with`|No
@@ -238,7 +238,7 @@ Name|Implemented
 `add`|No
 `addslashes`|Yes
 `capfirst`|Yes
-`center`|No
+`center`|Yes
 `cut`|No
 `date`|No
 `default`|No
@@ -246,8 +246,8 @@ Name|Implemented
 `dictsort`|No
 `dictsortreversed`|No
 `divisibleby`|No
-`escape`|No
-`escapejs`|No
+`escape`|Yes
+`escapejs`|Yes
 `filesizeformat`|No
 `first`|No
 `fix_ampersands`|No
@@ -271,7 +271,7 @@ Name|Implemented
 `random`|No
 `removetags`|No
 `rjust`|No
-`safe`|No
+`safe`|Yes
 `safeseq`|No
 `slice`|No
 `slugify`|No
@@ -446,7 +446,8 @@ Use something like the following for a named simple tag:
 ##9.2. Custom Filters
 
 Custom filters are functions that can accept a list of colon-separated
-arguments. They must return a list, binary, or iolist.
+arguments. They must return a tagged list, binary, or iolist, in the
+form `{ok, Out}`:
 
     -behaviour(dtl_library).
     -export([registered_filters/0,
@@ -460,10 +461,11 @@ arguments. They must return a list, binary, or iolist.
 
     %% @doc Reverses its input: {{ "Cat"|reverso }} -> "taC".
     reverso(Bin) ->
-        list_to_binary(lists:reverse(binary_to_list(Text))).
+        {ok, list_to_binary(lists:reverse(binary_to_list(Text)))}.
 
     %% @doc Adds to the first number: {{ 1|add:2 }} -> "3".
-    add(X, [Y]) -> integer_to_list(X + Y).
+    add(X, [Y]) ->
+        {ok, integer_to_list(X + Y)}.
 
 
 ##10. Troubleshooting
