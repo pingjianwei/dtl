@@ -23,20 +23,22 @@
 %% @doc Common things needed for tokenizing and parsing Django
 %%      templates.
 
--define(BLOCK_TAG_START, "{%").
--define(BLOCK_TAG_END, "%}").
+-define(BLOCK_TAG_START,    "{%").
+-define(BLOCK_TAG_END,      "%}").
+
 -define(VARIABLE_TAG_START, "{{").
--define(VARIABLE_TAG_END, "}}").
--define(COMMENT_TAG_START, "{#").
--define(COMMENT_TAG_END, "#}").
+-define(VARIABLE_TAG_END,   "}}").
+
+-define(COMMENT_TAG_START,  "{#").
+-define(COMMENT_TAG_END,    "#}").
 
 -define(SINGLE_BRACE_START, "{").
--define(SINGLE_BRACE_END, "}").
+-define(SINGLE_BRACE_END,   "}").
 
--define(TOKEN_TEXT, text).
--define(TOKEN_VAR, var).
--define(TOKEN_BLOCK, block).
+-define(TOKEN_BLOCK,   block).
 -define(TOKEN_COMMENT, comment).
+-define(TOKEN_TEXT,    text).
+-define(TOKEN_VAR,     var).
 
 -define(FIELD_SEPARATOR, "|").
 -define(FIELD_ARGUMENT_SEPARATOR, ":").
