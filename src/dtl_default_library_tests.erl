@@ -33,10 +33,11 @@
          wc/2,
          wc_render/2]).
 
+-include("test.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 load_tag_test_() ->
-    dtl_tests:compare_templates([
+    ?COMPARE_TEMPLATES([
         {Out, <<"{% load dtl_default_library_tests %}", In/binary>>} ||
             {Out, In} <- [{<<"Cat">>, <<"{{ dog|make_cat }}">>},
                              {<<"2">>,
@@ -61,18 +62,30 @@ block_tag_test() ->
     ?assertEqual(Expected4, Out4).
 
 filter_test_() ->
-    Ctx = dtl_context:new([{ quotes, <<"'\"\\">>}]),
-    dtl_tests:compare_templates([
+    Ctx = dtl_context:new([
+        {abc, <<"abc">>},
+        {cat, <<"Cat">>},
+        {quotes, <<"'\"\\">>},
+        {tag, <<"<p>">>},
+        {test, <<"'test'">>}
+    ]),
+    ?COMPARE_TEMPLATES([
+        {<<"\\&#39;\\&quot;\\\\">>, <<"{{ quotes|addslashes }}">>},
+        {<<"Trout">>, <<"{{ \"trout\"|capfirst }}">>},
         {<<"abc">>, <<"{{ \"ABC\"|lower }}">>},
         {<<"ABC">>, <<"{{ \"abc\"|upper }}">>},
-        {<<"\\'\\\"\\\\">>, <<"{{ quotes|addslashes }}">>},
-        {<<"Trout">>, <<"{{ \"trout\"|capfirst }}">>}
+        {<<"1. &lt;p&gt;">>, <<"1. {{ tag }}">>},
+        {<<"2. <p>">>, <<"2. {{ tag|safe }}">>},
+        {<<"3. &lt;p&gt;">>, <<"3. {{ tag|safe|escape }}">>},
+        {<<"4. <p>">>, <<"4. {% autoescape off %}{{ tag }}{% endautoescape %}">>},
+        {<<"5. &lt;p&gt;">>, <<"5. {% autoescape off %}{{ tag|escape }}{% endautoescape %}">>},
+        {<<"var s = '\\u0027test\\u0027';">>, <<"var s = '{{ test|escapejs }}';">>}
     ], Ctx).
 
 comment_tag_test_() ->
     Tests = [{<<>>, <<"{% comment %} Stuff {% endcomment %}">>}],
     Ctx = dtl_context:new(),
-    dtl_tests:compare_templates(Tests, Ctx).
+    ?COMPARE_TEMPLATES(Tests, Ctx).
 
 if_tag_test_() ->
     Tests = [{<<"true">>, <<"{% if 1 > 0 %}true{% endif %}">>},
@@ -88,7 +101,7 @@ if_tag_test_() ->
                            {b, a},
                            {c, b},
                            {weather, <<"sunny">>}]),
-    dtl_tests:compare_templates(Tests, Ctx).
+    ?COMPARE_TEMPLATES(Tests, Ctx).
 
 ifequal_tag_test_() ->
     Tests = [{<<"true">>, <<"{% ifequal 1 1 %}true{% endifequal %}">>},
@@ -101,7 +114,7 @@ ifequal_tag_test_() ->
     Ctx = dtl_context:new([{a, a},
                            {b, a},
                            {c, b}]),
-    dtl_tests:compare_templates(Tests, Ctx).
+    ?COMPARE_TEMPLATES(Tests, Ctx).
 
 forloop_test_() ->
     Tests = [{<<"1234">>, <<"{% for n in l %}{{ n }}{% endfor %}">>},
@@ -120,14 +133,14 @@ forloop_test_() ->
                            {l4, [[1, 2],
                                  [3, 4]]},
                            {a, <<"A">>}]),
-    dtl_tests:compare_templates(Tests, Ctx).
+    ?COMPARE_TEMPLATES(Tests, Ctx).
 
 ifchanged_test_() ->
     Tests = [{<<"123">>, <<"{% for n in l %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}">>},
              {<<"1...2..3">>, <<"{% for n in l2 %}{% ifchanged %}{{ n }}{% else %}.{% endifchanged %}{% endfor %}">>}],
     Ctx = dtl_context:new([{l, [1, 1, 2, 2, 3, 3, 3]},
                            {l2, [1, 1, 1, 1, 2, 2, 2, 3]}]),
-    dtl_tests:compare_templates(Tests, Ctx).
+    ?COMPARE_TEMPLATES(Tests, Ctx).
 
 %% dtl_library (for {% load %} tests).
 registered_filters() -> [make_cat].
@@ -137,7 +150,7 @@ registered_tags() -> [render_item, wc].
 %% Filters
 %%
 
-make_cat(_) -> <<"Cat">>.
+make_cat(_) -> {ok, <<"Cat">>}.
 
 %%
 %% Tags
@@ -162,6 +175,7 @@ render_item(Parser, Token) ->
     Item = dtl_filter:parse(RawItem, Parser),
     {ok, dtl_node:new("render_item", fun (_Node, Ctx) ->
         Label = dtl_context:fetch(Ctx, item_label),
-        ItemVal = list_to_binary(integer_to_list(dtl_filter:resolve_expr(Item, Ctx))),
+        {ok, N, _Safe} = dtl_filter:resolve_expr(Item, Ctx),
+        ItemVal = list_to_binary(integer_to_list(N)),
         <<"<p>", Label/binary, ": ", ItemVal/binary, "</p>">>
      end), Parser}.

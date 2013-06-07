@@ -23,8 +23,8 @@
 %% @doc Tests of basic node/nodelist mechanics and basic node types.
 -module(dtl_node_tests).
 
+-include("test.hrl").
 -include_lib("eunit/include/eunit.hrl").
-
 
 %% Test that basic text nodes are output correctly.
 text_node_test_() ->
@@ -59,14 +59,14 @@ variable_node_test_() ->
                            {nested, [{ a, 1 }]},
                            {an_atom, {1, 2, 3}},
                            {a_list, [1, 2, 3]}]),
-    dtl_tests:compare_templates(Tests, Ctx).
+    ?COMPARE_TEMPLATES(Tests, Ctx).
 
 empty_render_test_() ->
     Tests = [{<<"  ">>, <<" {{ MISSING }} ">>}],
     Ctx = dtl_context:new(),
-    dtl_tests:compare_templates(Tests, Ctx).
+    ?COMPARE_TEMPLATES(Tests, Ctx).
 
 comment_render_test_() ->
     Tests = [{<<>>, <<"{#\nComments\n#}">>}],
     Ctx = dtl_context:new(),
-    dtl_tests:compare_templates(Tests, Ctx).
+    ?COMPARE_TEMPLATES(Tests, Ctx).

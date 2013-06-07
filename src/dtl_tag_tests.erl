@@ -35,6 +35,7 @@
          simple_named/2,
          show_o/2]).
 
+-include("test.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 registered_filters() -> [].
@@ -46,14 +47,14 @@ registered_tags() -> [regular,
                        show_o}].
 
 regular_custom_tags_test() ->
-    dtl_tests:compare_templates([
+    ?COMPARE_TEMPLATES([
         {Out, <<"{% load dtl_tag_tests %}", In/binary>>} ||
             {Out, In} <- [{<<"<div>\n\nTest\n\n</div>">>,
                            <<"<div>\n\n{% regular \"Stuff\" %}\n\n</div>">>}]
     ], dtl_context:new()).
 
 simple_tags_test_() ->
-    dtl_tests:compare_templates([
+    ?COMPARE_TEMPLATES([
         {Out, <<"{% load dtl_tag_tests %}", In/binary>>} ||
             {Out, In} <- [{<<"Simple">>, <<"{% simple %}">>},
                           {<<"List">>, <<"{% simple_list %}">>},
@@ -62,7 +63,7 @@ simple_tags_test_() ->
     ], dtl_context:new()).
 
 inclusion_tag_test_() ->
-    dtl_tests:compare_templates([
+    ?COMPARE_TEMPLATES([
         {Out, <<"{% load dtl_tag_tests %}", In/binary>>} ||
             {Out, In} <- [{<<"O!\n">>, <<"{% show_o %}">>}]
     ], dtl_context:new()).

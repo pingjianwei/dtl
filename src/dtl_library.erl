@@ -45,7 +45,7 @@
 
 %% @doc Update the filters dict with all filters registered to the
 %%      specified `dtl_library' callback module.
--spec add_filters(atom(), dict()) -> dict().
+-spec add_filters(module(), dict()) -> dict().
 add_filters(Mod, Filters) ->
     lists:foldl(fun (Filter, Dict) ->
         dict:store(Filter, {Mod, Filter}, Dict)
@@ -53,7 +53,7 @@ add_filters(Mod, Filters) ->
 
 %% @doc Update the tags dict with all tags registered to the specified
 %%      `dtl_library' callback module.
--spec add_tags(atom(), dict()) -> dict().
+-spec add_tags(module(), dict()) -> dict().
 add_tags(Mod, Tags) ->
     lists:foldl(fun (UserTagSpec, Dict) ->
         {Name, Tag} = convert_user_tag_spec(Mod, UserTagSpec),

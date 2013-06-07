@@ -23,7 +23,9 @@
 %% @doc String utilities.
 -module(dtl_string).
 
--export([escape_re/1,
+-export([escape_html/1,
+         escape_js/1,
+         escape_re/1,
          safe_list_to_atom/1,
          smart_split/1]).
 
@@ -48,6 +50,40 @@
         ")+"
     %% 2. Or any number of non-space characters.
     ")|\\S+)").
+
+%% @doc Escape a binary for HTML output.
+-spec escape_html(binary()) -> binary().
+escape_html(Bin) ->
+    replace_all(Bin, [{<<$&>>, <<"&amp;">>},
+                      {<<$<>>, <<"&lt;">>},
+                      {<<$>>>, <<"&gt;">>},
+                      {<<$">>, <<"&quot;">>},
+                      {<<$'>>, <<"&#39;">>}]).
+
+replace_all(Bin1, Pairs) ->
+    lists:foldl(fun ({Char, Sub}, Bin) ->
+        binary:replace(Bin, Char, Sub, [global])
+    end, Bin1, Pairs).
+
+%% @doc Escape a binary for JS/JSON output.
+-spec escape_js(binary()) -> binary().
+escape_js(Bin) ->
+    RangeMaps = [{<<N>>, char_to_js_literal(N)}
+                 || N <- lists:seq(0, 31)],
+    replace_all(Bin, RangeMaps ++ [
+        {<<$\\>>, <<"\\u005C">>},
+        {<<$'>>, <<"\\u0027">>},
+        {<<$">>, <<"\\u0022">>},
+        {<<$>>>, <<"\\u003E">>},
+        {<<$<>>, <<"\\u003C">>},
+        {<<$&>>, <<"\\u0026">>},
+        {<<$=>>, <<"\\u003D">>},
+        {<<$->>, <<"\\u002D">>},
+        {<<$;>>, <<"\\u003B">>}
+    ]).
+
+char_to_js_literal(N) ->
+    list_to_binary("\\u" ++ io_lib:format("~4.16.0B", [N])).
 
 %% @doc Escape an input string for use within a regular expression (so
 %%      that all characters are interpreted literally). Every character

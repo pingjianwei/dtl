@@ -69,6 +69,6 @@ compile_string(Str) ->
     NodeList.
 
 %% Test if a term is a template or not.
--spec get_compiler(boolean()) -> {atom(), atom()}.
+-spec get_compiler(boolean()) -> {module(), module()}.
 get_compiler(true) -> {dtl_debug_lexer, dtl_debug_parser};
 get_compiler(false) -> {dtl_lexer, dtl_parser}.

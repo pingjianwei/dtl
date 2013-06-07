@@ -52,17 +52,25 @@
 %% Filters
 -export([addslashes/1,
          capfirst/1,
+         escape/1,
+         escapejs/1,
          lower/1,
+         safe/1,
          upper/1]).
 
 %% Tags
--export([block/2, render_block/2,
+-export([autoescape/2, render_autoescape/2,
+         block/2,      render_block/2,
+         % No renderer
          comment/2,
-         extends/2, render_extends/2,
-         for/2, render_for/2,
-         'if'/2, render_if/2,
-         ifchanged/2, render_ifchanged/2,
-         ifequal/2, ifnotequal/2, render_ifequal/2,
+         extends/2,    render_extends/2,
+         for/2,        render_for/2,
+         'if'/2,       render_if/2,
+         ifchanged/2,  render_ifchanged/2,
+         %% Shared renderer
+         ifequal/2,
+         ifnotequal/2, render_ifequal/2,
+         %% No renderer
          load/2]).
 
 %% {% if %} operators. All are binary except for <<"not">>, and all
@@ -81,7 +89,16 @@
          if_not_in/3,
          if_or/3]).
 
-registered_tags() -> [block,
+registered_filters() -> [addslashes,
+                         capfirst,
+                         escape,
+                         escapejs,
+                         lower,
+                         safe,
+                         upper].
+
+registered_tags() -> [autoescape,
+                      block,
                       comment,
                       extends,
                       for,
@@ -90,10 +107,6 @@ registered_tags() -> [block,
                       ifequal,
                       ifnotequal,
                       load].
-registered_filters() -> [addslashes,
-                         capfirst,
-                         lower,
-                         upper].
 
 -define(BLOCK_CONTEXT_KEY, block_context).
 
@@ -125,31 +138,80 @@ registered_filters() -> [addslashes,
 
 %% @doc Adds backslash prefix to single quotes, double quotes, and
 %%      backslashes. {{ "'\"\\" }} -> "\\'\\\"\\\\".
--spec addslashes(binary()) -> binary().
+-spec addslashes(binary()) -> {ok, binary()}.
 addslashes(Bin) ->
-    binary:replace(Bin, [<<"\\">>, <<"'">>, <<"\"">>], <<"\\">>,
-                   [global, {insert_replaced, 1}]).
+    {ok, binary:replace(Bin, [<<$\\>>, <<$'>>, <<$">>], <<$\\>>,
+                        [global, {insert_replaced, 1}])}.
 
 %% @doc Capitalizes the first character of the input.
 %%      {{ "pig"|capfirst }} -> "Pig".
--spec capfirst(binary()) -> binary().
+-spec capfirst(binary()) -> {ok, binary()}.
 capfirst(Bin) ->
     [C|S] = binary_to_list(Bin),
-    list_to_binary([ux_char:to_upper(C)|S]).
+    {ok, list_to_binary([ux_char:to_upper(C)|S])}.
+
+%% @doc Marks the input for escaping. This operation has the highest
+%%      precedence along with the "safe" filter. The last of these
+%%      filters occurs dictates which escaping behavior is used.
+-spec escape(binary()) -> {ok, binary(), escape}.
+escape(Bin) ->
+    {ok, Bin, escape}.
+
+%% @doc Escapes input for JS/JSON output.
+-spec escapejs(binary()) -> {ok, binary()}.
+escapejs(Bin) ->
+    {ok, dtl_string:escape_js(Bin)}.
 
 %% @doc Converts upper to lowercase. {{ "FOO"|lower }} -> "foo".
--spec lower(binary()) -> binary().
+-spec lower(binary()) -> {ok, binary()}.
 lower(Bin) ->
-    list_to_binary(ux_string:to_lower(binary_to_list(Bin))).
+    {ok, list_to_binary(ux_string:to_lower(binary_to_list(Bin)))}.
+
+%% @doc Marks the input as safe for output, requiring no escaping.
+-spec safe(binary()) -> {ok, binary(), safe}.
+safe(Bin) ->
+    {ok, Bin, safe}.
 
 %% @doc Converts lowercase to uppercase. {{ "foo"|upper }} -> "FOO".
--spec upper(binary()) -> binary().
+-spec upper(binary()) -> {ok, binary()}.
 upper(Bin) ->
-    list_to_binary(ux_string:to_upper(binary_to_list(Bin))).
+    {ok, list_to_binary(ux_string:to_upper(binary_to_list(Bin)))}.
 
 %%
 %% Tags
 %%
+
+%% @doc Toggles HTML escaping behavior in block. One argument, either
+%%      "on" or "off", is required.
+-spec autoescape(dtl_parser:parser(), binary()) ->
+    {ok, dtl_node:unode(), dtl_parser:parser()}
+        | {error, {badarg, autoescape_tag}}.
+autoescape(Parser, Token) ->
+    case dtl_parser:split_token(Token) of
+        [_Cmd, Set] ->
+            case lists:member(Set, [<<"on">>, <<"off">>]) of
+                true ->
+                    {ok, Nodes, Parser2} = dtl_parser:parse(Parser, [endautoescape]),
+                    Node = dtl_node:new("autoescape", {?MODULE, render_autoescape}),
+                    Node2 = dtl_node:set_nodelist(Node, Nodes),
+                    Node3 = dtl_node:set_state(Node2, Set =:= <<"on">>),
+                    {ok, Node3, dtl_parser:delete_first_token(Parser2)};
+                false ->
+                    {error, {badarg, autoescape_tag}}
+            end;
+        _ ->
+            {error, {badarg, autoescape_tag}}
+    end.
+
+-spec render_autoescape(dtl_node:unode(), dtl_context:context()) ->
+    {iodata(), dtl_context:context()}.
+render_autoescape(Node, Ctx) ->
+    AutoEscape = dtl_context:fetch(Ctx, autoescape) =:= true,
+    NewAutoEscape = dtl_node:state(Node),
+    Ctx2 = dtl_context:set(Ctx, autoescape, NewAutoEscape),
+    {ok, Bin, Ctx3} = dtl_node:render_list(dtl_node:nodelist(Node), Ctx2),
+    Ctx4 = dtl_context:set(Ctx3, autoescape, AutoEscape),
+    {Bin, Ctx4}.
 
 %% @doc Create or override a named section of a template.
 -spec block(dtl_parser:parser(), binary()) ->
@@ -263,7 +325,7 @@ render_extends(Node, Ctx) ->
 -spec get_parent(dtl_filter:expr(), dtl_context:context()) ->
     dtl_template:template().
 get_parent(Expr, Ctx) ->
-    Tpl = dtl_filter:resolve_expr(Expr, Ctx),
+    {ok, Tpl, _Safe} = dtl_filter:resolve_expr(Expr, Ctx),
     case dtl_template:is_template(Tpl) of
         true -> Tpl;
         false ->
@@ -472,7 +534,8 @@ do_render_if([], _Ctx, Rendered) ->
     lists:reverse(Rendered).
 
 if_eval_cond(#if_cond_token{type = literal, value = FilterExpr}, Ctx) ->
-    dtl_filter:resolve_expr(FilterExpr, Ctx);
+    {ok, Val, _Safe} = dtl_filter:resolve_expr(FilterExpr, Ctx),
+    Val;
 if_eval_cond(#if_cond_token{type = prefix, value = Fun, first = X}, Ctx) ->
     ?MODULE:Fun(X, Ctx);
 if_eval_cond(#if_cond_token{type = infix, value = Fun, first = X, second = Y}, Ctx) ->
@@ -548,8 +611,8 @@ do_ifequal(Parser, Token, Equal, End) ->
 
 render_ifequal(Node, Ctx) ->
     {Equal, X, Y, TrueNodes, FalseNodes} = dtl_node:state(Node),
-    X1 = dtl_filter:resolve_expr(X, Ctx),
-    Y1 = dtl_filter:resolve_expr(Y, Ctx),
+    {ok, X1, _} = dtl_filter:resolve_expr(X, Ctx),
+    {ok, Y1, _} = dtl_filter:resolve_expr(Y, Ctx),
     Passes = case Equal of
         true -> X1 == Y1;
         false -> X1 /= Y1
@@ -608,7 +671,8 @@ render_for(Node, Ctx) ->
         P -> P
     end,
     Ctx2 = dtl_context:push(Ctx),
-    {Bin, Ctx3} = case dtl_filter:resolve_expr(FromExpr, Ctx2) of
+    {ok, Val, _Safe} = dtl_filter:resolve_expr(FromExpr, Ctx2),
+    {Bin, Ctx3} = case Val of
         undefined ->
             render_for_empty(EmptyNodes, Ctx2);
         [] ->
@@ -685,7 +749,8 @@ render_ifchanged(Node, Ctx) ->
             {ok, CurBin, Ctx3} = dtl_node:render_list(TrueNodes, Ctx),
             {CurBin, Ctx3};
         _ ->
-            {[dtl_filter:resolve_expr(V, Ctx) || V <- Values], Ctx}
+            {[Val || {ok, Val, _} <-
+                [dtl_filter:resolve_expr(V, Ctx) || V <- Values], Ctx]}
     end,
     case ifchanged_changed(Ref, Cur, Ctx2) of
         {true, Ctx4} ->

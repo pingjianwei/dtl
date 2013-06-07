@@ -27,6 +27,8 @@
 %%      Definitions of core node types (text, variable, etc.).
 -module(dtl_node).
 
+-type escape_spec() :: safe | escape | undefined.
+
 -type renderer() :: {module(), atom()} | fun() | undefined.
 
 %% Nodes, the building blocks of templates. Nodes themselves may contain
@@ -43,8 +45,8 @@
     %% State bucket.
     state
 }).
-
 -opaque unode() :: #unode{}.
+
 -type tnode() :: unode() | binary() | list().
 
 -export([get_nodes_by_type/2,
@@ -61,7 +63,8 @@
          set_renderer/2,
          set_state/2,
          state/1]).
--export_type([tnode/0,
+-export_type([escape_spec/0,
+              tnode/0,
               unode/0]).
 
 %% @doc Create a new node with no renderer.
@@ -146,10 +149,21 @@ new_var(FilterExpr) ->
 %% @doc Variable node renderer.
 -spec render_var(tnode(), dtl_context:context()) -> binary().
 render_var(#unode{state = FilterExpr}, Ctx) ->
-    var_to_binary(dtl_filter:resolve_expr(FilterExpr, Ctx)).
+    {ok, Var, Safe} = dtl_filter:resolve_expr(FilterExpr, Ctx),
+    render_in_context(Var, Ctx, Safe).
+
+-spec render_in_context(term(), dtl_context:context(), escape_spec()) ->
+    binary().
+render_in_context(Var, Ctx, Safe) ->
+    Bin = var_to_binary(Var),
+    NeedsEscape = (dtl_context:fetch(Ctx, autoescape) =/= false
+        andalso Safe =/= safe) orelse Safe =:= escape,
+    case NeedsEscape of
+        true -> dtl_string:escape_html(Bin);
+        false -> Bin
+    end.
 
 -spec var_to_binary(term()) -> binary().
-%% This behavior may be configurable.
 var_to_binary(undefined) -> dtl:setting(empty_term_replacement);
 var_to_binary(T) when is_binary(T) -> T;
 var_to_binary(T) -> list_to_binary(io_lib:format("~w", [T])).

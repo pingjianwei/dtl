@@ -20,17 +20,10 @@
 %% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 %% SOFTWARE.
 
-%% @doc System tests of high-level DTL functions.
--module(dtl_tests).
+%% @doc Macros and things for tests.
 
--include_lib("eunit/include/eunit.hrl").
-
-setup() ->
-    dtl_ets_settings:set(apps, [test_app]).
-
-teardown(_) ->
-    dtl_ets_settings:clear().
-
-render_test_() ->
-    {setup, fun setup/0, fun teardown/1,
-     [?_assertEqual({ok, <<"Test\n">>}, dtl:render("test.html"))]}.
+-define(COMPARE_TEMPLATES(Tests, Ctx),
+        lists:foldl(fun ({Expect, In}, Tests2) ->
+            {ok, Out, _Ctx} = dtl_template:render(dtl_template:new(In), Ctx),
+            [?_assertEqual(Expect, Out)|Tests2]
+        end, [], Tests)).

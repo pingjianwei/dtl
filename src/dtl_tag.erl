@@ -62,8 +62,10 @@ inclusion_tag(Name, Mod, Fun, Parser, Token) ->
     {[binary()], dtl_context:context()}.
 render_inclusion_tag(Node, Ctx) ->
     {Mod, Fun, Args, Opts} = dtl_node:state(Node),
-    RealArgs = [dtl_filter:resolve_expr(A, Ctx) || A <- Args],
-    RealOpts = [{K, dtl_filter:resolve_expr(V, Ctx)} || {K, V} <- Opts],
+    RealArgs = [A2 || {ok, A2, _} <-
+        [dtl_filter:resolve_expr(A, Ctx) || A <- Args]],
+    RealOpts = [{K2, V2} || {K2, {ok, V2, _}} <-
+        [{K, dtl_filter:resolve_expr(V, Ctx)} || {K, V} <- Opts]],
     Ctx2 = dtl_context:update(Ctx, Mod:Fun(RealArgs, RealOpts)),
     {ok, Bin, Ctx3} = dtl_node:render_list(dtl_node:nodelist(Node), Ctx2),
     {Bin, dtl_context:pop(Ctx3)}.

@@ -23,6 +23,7 @@
 %% @doc Test variable filter mechanism.
 -module(dtl_filter_tests).
 
+-include("test.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 %% Test that filters work properly (depends on `dtl_library_tests' to
@@ -31,4 +32,4 @@ basic_filter_test_() ->
     Tests = [{<<"PIG">>, <<"{{ \"pig\"|upper }}">>},
              {<<" 1c2o3w ">>, <<" {{ \"1C2O3w\" | lower }} ">>},
              {<<"PIG">>, <<"{{ \"PIG\"|lower|upper }}">>}],
-    dtl_tests:compare_templates(Tests, dtl_context:new()).
+    ?COMPARE_TEMPLATES(Tests, dtl_context:new()).

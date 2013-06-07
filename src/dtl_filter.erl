@@ -38,6 +38,7 @@
 -type filter_arg() :: {boolean(), term()}.
 
 -export([parse/2,
+         process_term/1,
          resolve_expr/2]).
 -export_type([expr/0,
               filter/0,
@@ -154,11 +155,12 @@ process_var(Num = <<C, _/binary>>) when C >= $0, C =< $9;
 process_var(Var) ->
     string:tokens(binary_to_list(Var), ?VARIABLE_SEP).
 
--spec resolve_expr(expr(), dtl_context:context()) -> term().
+-spec resolve_expr(expr(), dtl_context:context()) ->
+    {ok, term(), dtl_node:escape_spec()}.
 resolve_expr(#expr{var = Var, filters = Filters}, Ctx) ->
-    resolve_expr_filters(Filters, resolve_var(Var, Ctx), Ctx).
+    resolve_expr_filters(Filters, resolve_var(Var, Ctx), Ctx, undefined).
 
-resolve_expr_filters([{{Mod, Fun}, Args}|Filters], Var, Ctx) ->
+resolve_expr_filters([{{Mod, Fun}, Args}|Filters], Var, Ctx, Safe) ->
     RealArgs = case Args of
         [] -> [Var];
         [{true, Arg}] -> [Var, resolve_lookup(Arg, Ctx)];
@@ -166,9 +168,10 @@ resolve_expr_filters([{{Mod, Fun}, Args}|Filters], Var, Ctx) ->
     end,
     case apply(Mod, Fun, RealArgs) of
         {error, Reason} -> {error, Reason};
-        Var2 -> resolve_expr_filters(Filters, Var2, Ctx)
+        {ok, Var2} -> resolve_expr_filters(Filters, Var2, Ctx, Safe);
+        {ok, Var2, Safe2} -> resolve_expr_filters(Filters, Var2, Ctx, Safe2)
     end;
-resolve_expr_filters([], Var, _Ctx) -> Var.
+resolve_expr_filters([], Var, _Ctx, Safe) -> {ok, Var, Safe}.
 
 -spec resolve_var(term(), dtl_context:context()) -> binary().
 resolve_var(Lookup = [[_|_]|_], Ctx) -> resolve_lookup(Lookup, Ctx);

@@ -55,7 +55,7 @@ new(Tokens) ->
     add_library(Parser, dtl_default_library).
 
 %% @doc Adds a library's tags and filters to the parser.
--spec add_library(parser(), atom()) -> parser().
+-spec add_library(parser(), module()) -> parser().
 add_library(Parser = #parser{tags = Tags, filters = Filters}, Mod) ->
     Parser#parser{filters = dtl_library:add_filters(Mod, Filters),
                   tags = dtl_library:add_tags(Mod, Tags)}.
