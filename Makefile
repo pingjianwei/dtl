@@ -75,9 +75,11 @@ check: check-clean dtl
 		-I include -dir test -logdir logs -suite $(CT_SUITES) \
 		|| ( f="$$(find logs -name eunit_suite.eunit.html | head -1)" ; \
 	if [[ -n "$$f" ]] ; then \
+		echo ; echo "$$f" ; \
 		[[ "$$(uname)" = Darwin ]] \
 			&& open -aFirefox "$$f" \
-			|| firefox -new-window "file://$$PWD/$$f" ; \
+			|| (hash firefox 2> /dev/null \
+				&& firefox -new-window "file://$$PWD/$$f") ; \
 	fi )
 ct: check
 test: check
