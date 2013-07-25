@@ -142,6 +142,11 @@ ifchanged_test_() ->
                            {l2, [1, 1, 1, 1, 2, 2, 2, 3]}]),
     ?COMPARE_TEMPLATES(Tests, Ctx).
 
+verbatim_test_() ->
+    Tests = [{<<"{{ x }}">>, <<"{% verbatim %}{{ x }}{% endverbatim %}">>}],
+    Ctx = dtl_context:new([{x, 1}]),
+    ?COMPARE_TEMPLATES(Tests, Ctx).
+
 %% dtl_library (for {% load %} tests).
 registered_filters() -> [make_cat].
 registered_tags() -> [render_item, wc].

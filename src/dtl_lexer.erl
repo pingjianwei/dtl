@@ -86,7 +86,7 @@ make_token(Src = <<?BLOCK_TAG_START, Rest/binary>>, true, true) ->
     Stripped = strip_token(Rest),
     EndsVerbatim = Stripped =:= <<"endverbatim">>,
     Token = case EndsVerbatim of
-        true -> {?TOKEN_BLOCK, Stripped};
+        true  -> {?TOKEN_COMMENT, Stripped};
         false -> {?TOKEN_TEXT, Src}
     end,
     {Token, not EndsVerbatim};
@@ -102,7 +102,10 @@ make_token(<<?VARIABLE_TAG_START, Rest/binary>>, true, Verbatim) ->
 %% Chop the {%, %}, and extra whitespace off of block tags.
 make_token(<<?BLOCK_TAG_START, Rest/binary>>, true, _Verbatim) ->
     Stripped = strip_token(Rest),
-    {{?TOKEN_BLOCK, Stripped}, Stripped =:= <<"verbatim">>};
+    case Stripped =:= <<"verbatim">> of
+        true  -> {{?TOKEN_COMMENT, Stripped}, true};
+        false -> {{?TOKEN_BLOCK, Stripped}, false}
+    end;
 %% Chop the {#, #}, and extra whitespace off of comment tags, saving
 %% their contents, if "Translators" occurs in the comment. Otherwise,
 %% throw it all out.
