@@ -1,4 +1,3 @@
-# Test
 language: erlang
 script: "make deps && make check"
 otp_release:
