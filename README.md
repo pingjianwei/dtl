@@ -12,6 +12,8 @@ A full-featured port of the Django template engine to Erlang.
     table documenting tag and filter compatibility with the Django
     defaults.
 
+API Documentation: [http://oinksoft.github.io/dtl/](http://oinksoft.github.io/dtl/)
+
 1. [Introduction](#1-introduction)
 2. [Installation](#2-installation)
 3. [Configuration](#3-configuration)
@@ -21,12 +23,8 @@ A full-featured port of the Django template engine to Erlang.
 7. [Built-in Tags and Filters](#7-built-in-tags-and-filters)
 8. [Loader Modules](#8-loader-modules)
 9. [Custom Tags and Filters](#9-custom-tags-and-filters)
-10. [Troubleshooting](#10-troubleshooting)
-11. [FAQ](#11-faq)
-12. [Support/Getting Help](#12-supportgetting-help)
-13. [API Documentation](#13-api-documentation)
-14. [Roadmap](#14-roadmap)
-15. [Who's Using DTL?](#15-whos-using-dtl)
+10. [Getting Help](#10-supportgetting-help)
+11. [Roadmap](#11-roadmap)
 
 
 ##1. Introduction
@@ -470,73 +468,16 @@ form `{ok, Out}`:
         {ok, integer_to_list(X + Y)}.
 
 
-##10. Troubleshooting
+##10. Getting Help
 
 Please report issues at
 [the Github issue queue](https://github.com/oinksoft/dtl/issues).
 
-For commercial support or customizations, please contact us via
-[our "Contact Us" page](https://oinksoft.com/contact/).
 
-
-##11. FAQ
-
-1.  _What's the point of this library when
-    [ErlyDTL](https://github.com/evanmiller/erlydtl) already exists?_
-
-    ErlyDTL is an excellent library. It generates **fast** templates and
-    is more than adequate for basic websites that do not need everything
-    Django's templates provide.
-
-    I was dismayed to find ErlyDTL to be lacking many features I
-    consider essential in the Django template engine, particularly the
-    ability for template tags to manipulate the parser, and the rather
-    standard mapping of an HTML file to a real template with no
-    compilation involved.
-
-    After investigating ErlyDTL thoroughly, I found its design quite
-    rigid with the default tempatle tags hard-coded, loading template
-    tag libraries requiring application configuration, and verbose
-    template names due to the requirement that each HTML template
-    generate an Erlang module. It seemed like a better idea to chart my
-    own path rather than to suggest some rewrite of ErlyDTL.
-
-    This project aims to be simple and readable before anything else,
-    providing an API that is very similar to that of `django.template`.
-    All template tags and filters, except for `{% verbatim %}` and
-    `{% comment %}`, both of which are optimized away in the lexer, will
-    be implemented using the custom tag/filter APIs. It probably won't
-    be as fast as ErlyDTL (I haven't benchmarked this at all), but I
-    believe its design lends itself better to template caching, should
-    applications require it.
-
-
-##12. Support/Getting Help
-
-Please report any bugs as issues at this github project.
-
-
-##13. API Documentation
-
-API documentation is regularly updated at https://oinksoft.com/doc/dtl/
-
-
-##14. Roadmap
+##11. Roadmap
 
 * Default tags and filters.
 * Performance optimizations (cache parsed templates in ETS, etc.).
 * Debug lexer and parser, better error handling.
 * I18n support.
 * OTP version?
-
-
-##15. Who's Using DTL?
-
-* https://oinksoft.com/ - Small business website.
-
-Well, nobody except Oinksoft right now! [oinksoft.com](https://oinksoft.com)
-was previously running on Django, and uses the templates from the old
-Django website with no modifications except for hard-coding replacements
-the `{% url %}` tag which I've not yet implemented for Cowboy.
-
-Send a message if you want your website on this list.
