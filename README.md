@@ -1,6 +1,6 @@
 #Django Template Language
 
-Latest build: ![Travis CI](https://api.travis-ci.org/oinksoft/dtl.png?branch=master)
+[![Travis CI](https://api.travis-ci.org/oinksoft/dtl.png?branch=master)](https://travis-ci.org/oinksoft/dtl)
 
 A full-featured port of the Django template engine to Erlang.
 
