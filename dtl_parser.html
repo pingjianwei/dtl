@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Module dtl_parser</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module dtl_parser</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Template parsing functions.
+
+
+<h2><a name="description">Description</a></h2>Template parsing functions.
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-parser">parser()</a></h3>
+<p><b>abstract datatype</b>: <tt>parser()</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_library-2">add_library/2</a></td><td>Adds a library's tags and filters to the parser.</td></tr>
+<tr><td valign="top"><a href="#blocks-1">blocks/1</a></td><td>Fetch the block name tracker.</td></tr>
+<tr><td valign="top"><a href="#delete_first_token-1">delete_first_token/1</a></td><td>Remove the first token from a parser's token list.</td></tr>
+<tr><td valign="top"><a href="#find_filter-2">find_filter/2</a></td><td>Searches the parser's filter collection for a filter with the
+       provided name.</td></tr>
+<tr><td valign="top"><a href="#find_tag-2">find_tag/2</a></td><td>Search the parser's tag collection for a tag with the provided
+       name.</td></tr>
+<tr><td valign="top"><a href="#new-1">new/1</a></td><td>Creates a new, empty parser.</td></tr>
+<tr><td valign="top"><a href="#next_token-1">next_token/1</a></td><td>Returns the parser's next token to process, and the parser
+       without this token.</td></tr>
+<tr><td valign="top"><a href="#parse-1">parse/1</a></td><td>Parses all tokens within the provided parser, returning the
+       resulting nodelist.</td></tr>
+<tr><td valign="top"><a href="#parse-2">parse/2</a></td><td>Parses all tokens within the provided parser until a block tag       
+token named in the second parameter is encountered.</td></tr>
+<tr><td valign="top"><a href="#set_blocks-2">set_blocks/2</a></td><td>Update the block name tracker.</td></tr>
+<tr><td valign="top"><a href="#skip_past-2">skip_past/2</a></td><td>Discard all tokens until the specified token is found.</td></tr>
+<tr><td valign="top"><a href="#split_token-1">split_token/1</a></td><td>Splits a block tag template token into its constituent parts,
+       splitting on all whitespace not contained in a "" pair.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="add_library-2">add_library/2</a></h3>
+<div class="spec">
+<p><tt>add_library(Parser::<a href="#type-parser">parser()</a>, Mod::module()) -&gt; <a href="#type-parser">parser()</a></tt><br></p>
+</div><p>Adds a library's tags and filters to the parser.</p>
+
+<h3 class="function"><a name="blocks-1">blocks/1</a></h3>
+<div class="spec">
+<p><tt>blocks(Parser::<a href="#type-parser">parser()</a>) -&gt; [binary()]</tt><br></p>
+</div><p>Fetch the block name tracker.</p>
+
+<h3 class="function"><a name="delete_first_token-1">delete_first_token/1</a></h3>
+<div class="spec">
+<p><tt>delete_first_token(Parser) -&gt; any()</tt></p>
+</div><p>Remove the first token from a parser's token list. Use this to
+       remove a token you just parsed up to with parse/2 when you want
+       to discard that token.</p>
+
+<h3 class="function"><a name="find_filter-2">find_filter/2</a></h3>
+<div class="spec">
+<p><tt>find_filter(Parser::<a href="#type-parser">parser()</a>, Name::<a href="dtl_library.html#type-name">dtl_library:name()</a>) -&gt; {ok, <a href="dtl_filter.html#type-filter_fun">dtl_filter:filter_fun()</a>} | nomatch</tt><br></p>
+</div><p>Searches the parser's filter collection for a filter with the
+       provided name.</p>
+
+<h3 class="function"><a name="find_tag-2">find_tag/2</a></h3>
+<div class="spec">
+<p><tt>find_tag(Parser::<a href="#type-parser">parser()</a>, Name::<a href="dtl_library.html#type-name">dtl_library:name()</a>) -&gt; {ok, <a href="dtl_library.html#type-tag_spec">dtl_library:tag_spec()</a>} | nomatch</tt><br></p>
+</div><p>Search the parser's tag collection for a tag with the provided
+       name.</p>
+
+<h3 class="function"><a name="new-1">new/1</a></h3>
+<div class="spec">
+<p><tt>new(Tokens::[<a href="dtl_lexer.html#type-token">dtl_lexer:token()</a>]) -&gt; <a href="#type-parser">parser()</a></tt><br></p>
+</div><p>Creates a new, empty parser.</p>
+
+<h3 class="function"><a name="next_token-1">next_token/1</a></h3>
+<div class="spec">
+<p><tt>next_token(Parser::<a href="#type-parser">parser()</a>) -&gt; {<a href="dtl_lexer.html#type-token">dtl_lexer:token()</a>, <a href="#type-parser">parser()</a>}</tt><br></p>
+</div><p>Returns the parser's next token to process, and the parser
+       without this token.</p>
+
+<h3 class="function"><a name="parse-1">parse/1</a></h3>
+<div class="spec">
+<p><tt>parse(Parse::<a href="#type-parser">parser()</a>) -&gt; {ok, [<a href="dtl_node.html#type-tnode">dtl_node:tnode()</a>], <a href="#type-parser">parser()</a>} | {error, atom()}</tt><br></p>
+</div><p>Parses all tokens within the provided parser, returning the
+       resulting nodelist. See parse/2 for errors.</p>
+
+<h3 class="function"><a name="parse-2">parse/2</a></h3>
+<div class="spec">
+<p><tt>parse(Parser::<a href="#type-parser">parser()</a>, Until::[atom()]) -&gt; {ok, [<a href="dtl_node.html#type-tnode">dtl_node:tnode()</a>], <a href="#type-parser">parser()</a>} | {error, atom()}</tt><br></p>
+</div><p><p>Parses all tokens within the provided parser until a block tag       
+token named in the second parameter is encountered.</p>
+ 
+       <p>Errors:</p>
+ 
+       <p>unclosed_block_tag: If the second parameter is non-empty and           
+none of the candidate block tags are ever encountered.</p>
+ 
+       <p>empty_block_tag: If the parser encounters a block tag with no           
+contents.</p>
+ 
+       {unknown_tag, Name}: If an unregistered block tag is encountered.</p>
+
+<h3 class="function"><a name="set_blocks-2">set_blocks/2</a></h3>
+<div class="spec">
+<p><tt>set_blocks(Parser::<a href="#type-parser">parser()</a>, Blocks::[binary()]) -&gt; <a href="#type-parser">parser()</a></tt><br></p>
+</div><p>Update the block name tracker.</p>
+
+<h3 class="function"><a name="skip_past-2">skip_past/2</a></h3>
+<div class="spec">
+<p><tt>skip_past(Parser::<a href="#type-parser">parser()</a>, Until::atom()) -&gt; <a href="#type-parser">parser()</a> | {error, {unclosed_block_tag, atom()}}</tt><br></p>
+</div><p>Discard all tokens until the specified token is found.</p>
+
+<h3 class="function"><a name="split_token-1">split_token/1</a></h3>
+<div class="spec">
+<p><tt>split_token(Src::binary()) -&gt; [binary()]</tt><br></p>
+</div><p>Splits a block tag template token into its constituent parts,
+       splitting on all whitespace not contained in a "" pair.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Jan 11 2014, 00:40:53.</i></p>
+</body>
+</html>

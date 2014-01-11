@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Module dtl_default_library</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module dtl_default_library</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Default tags and templates.
+
+<p><b>Behaviours:</b> <a href="dtl_library.html"><tt>dtl_library</tt></a>.</p>
+
+<h2><a name="description">Description</a></h2>Default tags and templates.
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#if-2">'if'/2</a></td><td>If/elif/else/endif tag.</td></tr>
+<tr><td valign="top"><a href="#addslashes-1">addslashes/1</a></td><td>Adds backslash prefix to single quotes, double quotes, and
+       backslashes.</td></tr>
+<tr><td valign="top"><a href="#autoescape-2">autoescape/2</a></td><td>Toggles HTML escaping behavior in block.</td></tr>
+<tr><td valign="top"><a href="#block-2">block/2</a></td><td>Create or override a named section of a template.</td></tr>
+<tr><td valign="top"><a href="#capfirst-1">capfirst/1</a></td><td>Capitalizes the first character of the input.</td></tr>
+<tr><td valign="top"><a href="#comment-2">comment/2</a></td><td>Comment tag.</td></tr>
+<tr><td valign="top"><a href="#escape-1">escape/1</a></td><td>Marks the input for escaping.</td></tr>
+<tr><td valign="top"><a href="#escapejs-1">escapejs/1</a></td><td>Escapes input for JS/JSON output.</td></tr>
+<tr><td valign="top"><a href="#extends-2">extends/2</a></td><td>Inherit one template from another.</td></tr>
+<tr><td valign="top"><a href="#for-2">for/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_and-3">if_and/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_eq-3">if_eq/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_exact_eq-3">if_exact_eq/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_exact_neq-3">if_exact_neq/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_gt-3">if_gt/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_gte-3">if_gte/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_in-3">if_in/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_lt-3">if_lt/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_lte-3">if_lte/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_neq-3">if_neq/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_not-2">if_not/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_not_in-3">if_not_in/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#if_or-3">if_or/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#ifchanged-2">ifchanged/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#ifequal-2">ifequal/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#ifnotequal-2">ifnotequal/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#load-2">load/2</a></td><td>Loads tag: <code>{% load library_name %}</code> where <code>library_name</code> is a
+       module implementing the <code>dtl_library</code> interface.</td></tr>
+<tr><td valign="top"><a href="#lower-1">lower/1</a></td><td>Converts upper to lowercase.</td></tr>
+<tr><td valign="top"><a href="#registered_filters-0">registered_filters/0</a></td><td></td></tr>
+<tr><td valign="top"><a href="#registered_tags-0">registered_tags/0</a></td><td></td></tr>
+<tr><td valign="top"><a href="#render_autoescape-2">render_autoescape/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#render_block-2">render_block/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#render_extends-2">render_extends/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#render_for-2">render_for/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#render_if-2">render_if/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#render_ifchanged-2">render_ifchanged/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#render_ifequal-2">render_ifequal/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#safe-1">safe/1</a></td><td>Marks the input as safe for output, requiring no escaping.</td></tr>
+<tr><td valign="top"><a href="#upper-1">upper/1</a></td><td>Converts lowercase to uppercase.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="if-2">'if'/2</a></h3>
+<div class="spec">
+<p><tt>if(Parser, Token) -&gt; any()</tt></p>
+</div><p>If/elif/else/endif tag.</p>
+
+<h3 class="function"><a name="addslashes-1">addslashes/1</a></h3>
+<div class="spec">
+<p><tt>addslashes(Bin::binary()) -&gt; {ok, binary()}</tt><br></p>
+</div><p>Adds backslash prefix to single quotes, double quotes, and
+       backslashes. {{ "'\"\\" }} -&gt; "\\'\\\"\\\\".</p>
+
+<h3 class="function"><a name="autoescape-2">autoescape/2</a></h3>
+<div class="spec">
+<p><tt>autoescape(Parser::<a href="dtl_parser.html#type-parser">dtl_parser:parser()</a>, Token::binary()) -&gt; {ok, <a href="dtl_node.html#type-unode">dtl_node:unode()</a>, <a href="dtl_parser.html#type-parser">dtl_parser:parser()</a>} | {error, {badarg, autoescape_tag}}</tt><br></p>
+</div><p>Toggles HTML escaping behavior in block. One argument, either
+       "on" or "off", is required.</p>
+
+<h3 class="function"><a name="block-2">block/2</a></h3>
+<div class="spec">
+<p><tt>block(Parser::<a href="dtl_parser.html#type-parser">dtl_parser:parser()</a>, Token::binary()) -&gt; {ok, <a href="dtl_node.html#type-unode">dtl_node:unode()</a>, <a href="dtl_parser.html#type-parser">dtl_parser:parser()</a>} | {error, {badarg, block_tag} | {block_redefined, binary()}}</tt><br></p>
+</div><p>Create or override a named section of a template.</p>
+
+<h3 class="function"><a name="capfirst-1">capfirst/1</a></h3>
+<div class="spec">
+<p><tt>capfirst(Bin::binary()) -&gt; {ok, binary()}</tt><br></p>
+</div><p>Capitalizes the first character of the input.
+       {{ "pig"|capfirst }} -&gt; "Pig".</p>
+
+<h3 class="function"><a name="comment-2">comment/2</a></h3>
+<div class="spec">
+<p><tt>comment(Parser, Token) -&gt; any()</tt></p>
+</div><p>Comment tag. Everything between {% comment %} and
+       {% endcomment %} is dropped from the document.</p>
+
+<h3 class="function"><a name="escape-1">escape/1</a></h3>
+<div class="spec">
+<p><tt>escape(Bin::binary()) -&gt; {ok, binary(), escape}</tt><br></p>
+</div><p>Marks the input for escaping. This operation has the highest
+       precedence along with the "safe" filter. The last of these
+       filters occurs dictates which escaping behavior is used.</p>
+
+<h3 class="function"><a name="escapejs-1">escapejs/1</a></h3>
+<div class="spec">
+<p><tt>escapejs(Bin::binary()) -&gt; {ok, binary()}</tt><br></p>
+</div><p>Escapes input for JS/JSON output.</p>
+
+<h3 class="function"><a name="extends-2">extends/2</a></h3>
+<div class="spec">
+<p><tt>extends(Parser::<a href="dtl_parser.html#type-parser">dtl_parser:parser()</a>, Token::binary()) -&gt; {ok, <a href="dtl_node.html#type-unode">dtl_node:unode()</a>, <a href="dtl_parser.html#type-parser">dtl_parser:parser()</a>} | {error, {template_not_found, binary()} | {badarg, extends_tag} | multiple_extends_tags}</tt><br></p>
+</div><p>Inherit one template from another. Child template must define
+       all content in {% block Name %} tags, which will override any block
+       with the same name in parent templates.</p>
+
+<h3 class="function"><a name="for-2">for/2</a></h3>
+<div class="spec">
+<p><tt>for(Parser, Token) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_and-3">if_and/3</a></h3>
+<div class="spec">
+<p><tt>if_and(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_eq-3">if_eq/3</a></h3>
+<div class="spec">
+<p><tt>if_eq(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_exact_eq-3">if_exact_eq/3</a></h3>
+<div class="spec">
+<p><tt>if_exact_eq(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_exact_neq-3">if_exact_neq/3</a></h3>
+<div class="spec">
+<p><tt>if_exact_neq(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_gt-3">if_gt/3</a></h3>
+<div class="spec">
+<p><tt>if_gt(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_gte-3">if_gte/3</a></h3>
+<div class="spec">
+<p><tt>if_gte(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_in-3">if_in/3</a></h3>
+<div class="spec">
+<p><tt>if_in(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_lt-3">if_lt/3</a></h3>
+<div class="spec">
+<p><tt>if_lt(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_lte-3">if_lte/3</a></h3>
+<div class="spec">
+<p><tt>if_lte(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_neq-3">if_neq/3</a></h3>
+<div class="spec">
+<p><tt>if_neq(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_not-2">if_not/2</a></h3>
+<div class="spec">
+<p><tt>if_not(X, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_not_in-3">if_not_in/3</a></h3>
+<div class="spec">
+<p><tt>if_not_in(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="if_or-3">if_or/3</a></h3>
+<div class="spec">
+<p><tt>if_or(X, Y, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="ifchanged-2">ifchanged/2</a></h3>
+<div class="spec">
+<p><tt>ifchanged(Parser, Token) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="ifequal-2">ifequal/2</a></h3>
+<div class="spec">
+<p><tt>ifequal(Parser, Token) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="ifnotequal-2">ifnotequal/2</a></h3>
+<div class="spec">
+<p><tt>ifnotequal(Parser, Token) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="load-2">load/2</a></h3>
+<div class="spec">
+<p><tt>load(Parser::<a href="dtl_parser.html#type-parser">dtl_parser:parser()</a>, Token::binary()) -&gt; {ok, <a href="dtl_node.html#type-unode">dtl_node:unode()</a>, <a href="dtl_parser.html#type-parser">dtl_parser:parser()</a>} | {error, {missing_library, binary()} | load_tag_syntax_error}</tt><br></p>
+</div><p>Loads tag: <code>{% load library_name %}</code> where <code>library_name</code> is a
+       module implementing the <code>dtl_library</code> interface.</p>
+
+<h3 class="function"><a name="lower-1">lower/1</a></h3>
+<div class="spec">
+<p><tt>lower(Bin::binary()) -&gt; {ok, binary()}</tt><br></p>
+</div><p>Converts upper to lowercase. {{ "FOO"|lower }} -&gt; "foo".</p>
+
+<h3 class="function"><a name="registered_filters-0">registered_filters/0</a></h3>
+<div class="spec">
+<p><tt>registered_filters() -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="registered_tags-0">registered_tags/0</a></h3>
+<div class="spec">
+<p><tt>registered_tags() -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="render_autoescape-2">render_autoescape/2</a></h3>
+<div class="spec">
+<p><tt>render_autoescape(Node::<a href="dtl_node.html#type-unode">dtl_node:unode()</a>, Ctx::<a href="dtl_context.html#type-context">dtl_context:context()</a>) -&gt; {iodata(), <a href="dtl_context.html#type-context">dtl_context:context()</a>}</tt><br></p>
+</div>
+
+<h3 class="function"><a name="render_block-2">render_block/2</a></h3>
+<div class="spec">
+<p><tt>render_block(Node::<a href="dtl_node.html#type-unode">dtl_node:unode()</a>, Ctx::<a href="dtl_context.html#type-context">dtl_context:context()</a>) -&gt; {[binary()], <a href="dtl_context.html#type-context">dtl_context:context()</a>}</tt><br></p>
+</div>
+
+<h3 class="function"><a name="render_extends-2">render_extends/2</a></h3>
+<div class="spec">
+<p><tt>render_extends(Node::<a href="dtl_node.html#type-unode">dtl_node:unode()</a>, Ctx::<a href="dtl_context.html#type-context">dtl_context:context()</a>) -&gt; {binary(), <a href="dtl_context.html#type-context">dtl_context:context()</a>}</tt><br></p>
+</div>
+
+<h3 class="function"><a name="render_for-2">render_for/2</a></h3>
+<div class="spec">
+<p><tt>render_for(Node, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="render_if-2">render_if/2</a></h3>
+<div class="spec">
+<p><tt>render_if(Node, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="render_ifchanged-2">render_ifchanged/2</a></h3>
+<div class="spec">
+<p><tt>render_ifchanged(Node, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="render_ifequal-2">render_ifequal/2</a></h3>
+<div class="spec">
+<p><tt>render_ifequal(Node, Ctx) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="safe-1">safe/1</a></h3>
+<div class="spec">
+<p><tt>safe(Bin::binary()) -&gt; {ok, binary(), safe}</tt><br></p>
+</div><p>Marks the input as safe for output, requiring no escaping.</p>
+
+<h3 class="function"><a name="upper-1">upper/1</a></h3>
+<div class="spec">
+<p><tt>upper(Bin::binary()) -&gt; {ok, binary()}</tt><br></p>
+</div><p>Converts lowercase to uppercase. {{ "foo"|upper }} -&gt; "FOO".</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Jan 11 2014, 00:40:53.</i></p>
+</body>
+</html>
