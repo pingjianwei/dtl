@@ -207,7 +207,7 @@ Name|Implemented
 `block`|Yes
 `comment`|Yes
 `csrf_token`|Won't support
-`cycle`|No
+`cycle`|Yes
 `debug`|No
 `extends`|Yes
 `filter`|No
@@ -403,7 +403,7 @@ in the sections below.
     example of a tag wrapper, which may be provided as a `{module(),
     tuple(), term()}` triple as the first element of a tag spec. For
     `inclusion_tag`, TemplateName is the name of the template this tag
-    includes. ContextFunction is a function that can inject data into
+    includes. `ContextFunction` is a function that can inject data into
     this template by returning a `dtl_context()` or a proplist. It
     receives any arguments passed to the inclusion tag as positional and
     keyword argument lists.

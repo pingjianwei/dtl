@@ -45,7 +45,6 @@
                        Node :: dtl_node:unode()}.
 -type if_cond_token() :: #if_cond_token{}.
 -type if_cond_type() :: infix | prefix | literal | ending.
-
 -export([registered_tags/0,
          registered_filters/0]).
 
@@ -71,7 +70,8 @@
          ifequal/2,
          ifnotequal/2, render_ifequal/2,
          %% No renderer
-         load/2]).
+         load/2,
+         cycle/2,      render_cycle/2]).
 
 %% {% if %} operators. All are binary except for <<"not">>, and all
 %% accept a context.
@@ -100,6 +100,7 @@ registered_filters() -> [addslashes,
 registered_tags() -> [autoescape,
                       block,
                       comment,
+                      cycle,
                       extends,
                       for,
                       'if',
@@ -777,3 +778,28 @@ ifchanged_changed(Ref, Cur, Ctx) ->
         _ -> Old =/= Cur
     end,
     {Changed, Ctx2}.
+
+cycle(Parser, Token) ->
+    [_|Bits] = dtl_parser:split_token(Token),
+    case Bits of
+        [_|_] ->
+            Node = dtl_node:new("cycle", {?MODULE, render_cycle}),
+            Vals = [dtl_filter:parse(Bit, Parser) || Bit <- Bits],
+            Node2 = dtl_node:set_state(Node, {make_ref(), Vals}),
+            {ok, Node2, Parser};
+        _ ->
+            {error, {badarg, cycle_tag}}
+    end.
+
+render_cycle(Node, Ctx) ->
+    {Ref, Vals} = dtl_node:state(Node),
+    ForCtx = dtl_context:fetch(Ctx, forloop),
+    Index = case dtl_context:fetch(ForCtx, Ref) of
+        undefined -> 0;
+        N -> N
+    end,
+    Index2 = if length(Vals) =< Index -> 1; true -> Index + 1 end,
+    ForCtx2 = dtl_context:set(ForCtx, Ref, Index2),
+    Ctx2 = dtl_context:set_ref(Ctx, forloop, ForCtx2),
+    {ok, Val, _Safe} = dtl_filter:resolve_expr(lists:nth(Index2, Vals), Ctx2),
+    {Val, Ctx2}.

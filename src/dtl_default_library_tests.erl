@@ -147,6 +147,14 @@ verbatim_test_() ->
     Ctx = dtl_context:new([{x, 1}]),
     ?COMPARE_TEMPLATES(Tests, Ctx).
 
+cycle_test_() ->
+    Tests = [{<<"abab">>, <<"{% for n in l %}{% cycle \"a\" \"b\" %}{% endfor %}">>},
+             {<<"cdcd">>, <<"{% for n in l %}{% cycle c d %}{% endfor %}">>}],
+    Ctx = dtl_context:new([{l, [0, 0, 0, 0]},
+                           {c, "c"},
+                           {d, "d"}]),
+    ?COMPARE_TEMPLATES(Tests, Ctx).
+
 %% dtl_library (for {% load %} tests).
 registered_filters() -> [make_cat].
 registered_tags() -> [render_item, wc].
