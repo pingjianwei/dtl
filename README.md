@@ -211,7 +211,7 @@ Name|Implemented
 `debug`|No
 `extends`|Yes
 `filter`|No
-`firstof`|No
+`firstof`|Yes
 `for`|Yes
 `for ... empty`|Yes
 `if`|Yes
