@@ -63,6 +63,7 @@
          % No renderer
          comment/2,
          extends/2,    render_extends/2,
+         firstof/2,
          for/2,        render_for/2,
          'if'/2,       render_if/2,
          ifchanged/2,  render_ifchanged/2,
@@ -102,6 +103,7 @@ registered_tags() -> [autoescape,
                       comment,
                       cycle,
                       extends,
+                      firstof,
                       for,
                       'if',
                       ifchanged,
@@ -803,3 +805,27 @@ render_cycle(Node, Ctx) ->
     Ctx2 = dtl_context:set_ref(Ctx, forloop, ForCtx2),
     {ok, Val, _Safe} = dtl_filter:resolve_expr(lists:nth(Index2, Vals), Ctx2),
     {Val, Ctx2}.
+
+firstof(Parser, Token) ->
+    [_|Bits] = dtl_parser:split_token(Token),
+    case Bits of
+        [_|_] ->
+            Terms = [dtl_filter:parse(Bit, Parser) || Bit <- Bits],
+            Node = dtl_node:new("firstof", fun (Node, Ctx) ->
+                Vals = lists:map(fun (T) ->
+                    {ok, V, _Safe} = dtl_filter:resolve_expr(T, Ctx),
+                    V
+                end, Terms),
+                case lists:dropwhile(fun (V) ->
+                        V =:= false orelse V =:= undefined
+                    end, Vals) of
+                    [H|T] ->
+                        {[H], Ctx};
+                    O ->
+                        {<<>>, Ctx}
+                end
+            end),
+            {ok, Node, Parser};
+        _ ->
+            {error, {badarg, firstof_tag}}
+    end.

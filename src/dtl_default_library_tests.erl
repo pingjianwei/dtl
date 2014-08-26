@@ -155,6 +155,15 @@ cycle_test_() ->
                            {d, "d"}]),
     ?COMPARE_TEMPLATES(Tests, Ctx).
 
+firstof_test_() ->
+    Tests = [{<<1>>, <<"{% firstof false false 1 2 %}">>},
+             {<<"Hello">>, <<"{% firstof a b c d %}">>}],
+    Ctx = dtl_context:new([{a, false},
+                           {b, false},
+                           {c, "Hello"},
+                           {d, "Hi"}]),
+    ?COMPARE_TEMPLATES(Tests, Ctx).
+
 %% dtl_library (for {% load %} tests).
 registered_filters() -> [make_cat].
 registered_tags() -> [render_item, wc].
