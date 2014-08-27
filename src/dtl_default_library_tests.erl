@@ -164,6 +164,13 @@ firstof_test_() ->
                            {d, "Hi"}]),
     ?COMPARE_TEMPLATES(Tests, Ctx).
 
+include_test_() ->
+    Tests = [{<<"1\n">>, <<"{% include \"included.html\" %}">>},
+             {<<"1\n">>, <<"{% include template %}">>}],
+    Ctx = dtl_context:new([{template, "included.html"},
+                           {o, 1}]),
+    ?COMPARE_TEMPLATES(Tests, Ctx).
+
 %% dtl_library (for {% load %} tests).
 registered_filters() -> [make_cat].
 registered_tags() -> [render_item, wc].

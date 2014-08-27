@@ -218,7 +218,7 @@ Name|Implemented
 `ifchanged`|Yes
 `ifequal`|Yes
 `ifnotequal`|Yes
-`include`|No
+`include`|Yes
 `load`|Yes
 `now`|No
 `regroup`|No

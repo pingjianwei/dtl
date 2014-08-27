@@ -63,7 +63,8 @@
          % No renderer
          comment/2,
          extends/2,    render_extends/2,
-         firstof/2,
+         include/2,    render_include/2,
+         firstof/2,    render_firstof/2,
          for/2,        render_for/2,
          'if'/2,       render_if/2,
          ifchanged/2,  render_ifchanged/2,
@@ -109,6 +110,7 @@ registered_tags() -> [autoescape,
                       ifchanged,
                       ifequal,
                       ifnotequal,
+                      include,
                       load].
 
 -define(BLOCK_CONTEXT_KEY, block_context).
@@ -311,7 +313,7 @@ extends(Parser, Token) ->
     {binary(), dtl_context:context()}.
 render_extends(Node, Ctx) ->
     {ParentName, Blocks} = dtl_node:state(Node),
-    Parent = get_parent(ParentName, Ctx),
+    Parent = get_template(ParentName, Ctx),
     ParentNodes = dtl_template:nodelist(Parent),
     BlockSpecs = blocks_to_plist(Blocks),
     BlockSpecs2 = blocks_to_plist(get_parent_blocks(ParentNodes)),
@@ -325,16 +327,19 @@ render_extends(Node, Ctx) ->
 
 %% TODO: Reject empty template name/take appropriate action when
 %%       template is not found.
--spec get_parent(dtl_filter:expr(), dtl_context:context()) ->
+-spec get_template(dtl_filter:expr(), dtl_context:context()) ->
     dtl_template:template().
-get_parent(Expr, Ctx) ->
+get_template(Expr, Ctx) ->
     {ok, Tpl, _Safe} = dtl_filter:resolve_expr(Expr, Ctx),
     case dtl_template:is_template(Tpl) of
         true -> Tpl;
         false ->
-            {ok, Tpl2} = dtl_loader:get_template(binary_to_list(Tpl)),
+            {ok, Tpl2} = dtl_loader:get_template(template_name(Tpl)),
             Tpl2
     end.
+
+template_name(Name) when is_binary(Name) -> binary_to_list(Name);
+template_name(Name) when is_list(Name) -> Name.
 
 %% Equivalent of dict([tuple()]) in Python, preserving the last of
 %% duplicate key values.
@@ -807,25 +812,45 @@ render_cycle(Node, Ctx) ->
     {Val, Ctx2}.
 
 firstof(Parser, Token) ->
-    [_|Bits] = dtl_parser:split_token(Token),
+    [_Cmd|Bits] = dtl_parser:split_token(Token),
     case Bits of
         [_|_] ->
+            Node = dtl_node:new("firstof", {?MODULE, render_firstof}),
             Terms = [dtl_filter:parse(Bit, Parser) || Bit <- Bits],
-            Node = dtl_node:new("firstof", fun (Node, Ctx) ->
-                Vals = lists:map(fun (T) ->
-                    {ok, V, _Safe} = dtl_filter:resolve_expr(T, Ctx),
-                    V
-                end, Terms),
-                case lists:dropwhile(fun (V) ->
-                        V =:= false orelse V =:= undefined
-                    end, Vals) of
-                    [H|T] ->
-                        {[H], Ctx};
-                    O ->
-                        {<<>>, Ctx}
-                end
-            end),
-            {ok, Node, Parser};
+            Node2 = dtl_node:set_state(Node, Terms),
+            {ok, Node2, Parser};
         _ ->
             {error, {badarg, firstof_tag}}
     end.
+
+render_firstof(Node, Ctx) ->
+    Terms = dtl_node:state(Node),
+    Vals = lists:map(fun (T) ->
+        {ok, V, _Safe} = dtl_filter:resolve_expr(T, Ctx),
+        V
+    end, Terms),
+    case lists:dropwhile(fun (V) ->
+            V =:= false orelse V =:= undefined
+        end, Vals) of
+        [H|T] ->
+            {[H], Ctx};
+        O ->
+            {<<>>, Ctx}
+    end.
+
+include(Parser, Token) ->
+    case dtl_parser:split_token(Token) of
+        [_Cmd, RawName] ->
+            Node = dtl_node:new("include", {?MODULE, render_include}),
+            TemplateName = dtl_filter:parse(RawName, Parser),
+            Node2 = dtl_node:set_state(Node, TemplateName),
+            {ok, Node2, Parser};
+        _ ->
+            {error, {badarg, include_tag}}
+    end.
+
+render_include(Node, Ctx) ->
+    TemplateName = dtl_node:state(Node),
+    Template = get_template(TemplateName, Ctx),
+    {ok, Bin, Ctx2} = dtl_template:render(Template, Ctx),
+    {Bin, Ctx2}.
