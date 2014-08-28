@@ -25,11 +25,8 @@
 -export([maps/0,
          is_map/1]).
 
-function_exists(M, F, A) ->
-    erlang:function_exported(M, F, A) or erlang:is_builtin(M, F, A).
-
 maps() ->
-    function_exists(erlang, is_map, 1).
+    erlang:is_builtin(erlang, is_map, 1).
 
 is_map(V) ->
     case maps() of
