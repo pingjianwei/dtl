@@ -32,5 +32,14 @@ teardown(_) ->
     dtl_ets_settings:clear().
 
 render_test_() ->
-    {setup, fun setup/0, fun teardown/1,
-     [?_assertEqual({ok, <<"Test\n">>}, dtl:render("test.html"))]}.
+    Tests = [?_assertEqual({ok, <<"Test\n">>},
+                           dtl:render("test.html")),
+             ?_assertEqual({ok, <<"1\n">>},
+                           dtl:render("included.html", [{o, 1}]))],
+    Tests2 = case dtl_support:maps() of
+        true ->
+            [?_assertEqual({ok, <<"2\n">>},
+                           dtl:render("included.html", #{o => 2}))|Tests];
+        false -> Tests
+    end,
+    {setup, fun setup/0, fun teardown/1, Tests2}.

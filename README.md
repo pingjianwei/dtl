@@ -124,6 +124,14 @@ your template files.
 
 Render a template:
 
+    {ok, Html} = dtl:render("index.html", #{
+        title => "The World Wide Web",
+        visitor_count => 12
+    }).
+
+Property lists are also supported, if your version of Erlang does not support
+maps.
+
     {ok, Html} = dtl:render("index.html", [
         {title, "The World Wide Web"},
         {visitor_count, 12}
@@ -171,12 +179,18 @@ will be accessible in any template into which the context is loaded:
     ]),
     {ok, Bin} = dtl:render(Tpl, Ctx).
 
+`dtl:render/2` automatically wraps its context argument, so you need not provide
+a context explicitly as in the last example:
+
+    {ok, Bin} = dtl:render(Tpl, #{foo => "Foo", bar => "Bar"}).
 
 ###6.1. Context Processors
 
 A user may specify a list of {Mod, Fun} tuples which will be called, in
 order, when initializing a new context. Each function should return a
-property list. Here is an example context processor:
+property list (maps support is in the works).
+
+Here is an example context processor:
 
     process_time() ->
         Time = calendar:local_time(),

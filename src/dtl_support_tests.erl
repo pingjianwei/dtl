@@ -20,36 +20,16 @@
 %% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 %% SOFTWARE.
 
-%% @doc Core API functions, some convenient shortcuts.
--module(dtl).
+-module(dtl_support_tests).
 
--export([render/1,
-         render/2,
-         setting/1,
-         setting/2]).
+-include_lib("eunit/include/eunit.hrl").
 
-%% @doc Creates and renders the template with the provided name.
--spec render(list()) -> {ok, binary()} | {error, atom()}.
-render(Name) -> render(Name, dtl_context:new()).
+maps_support_test() ->
+    ?assertEqual(should_support_maps(), dtl_support:maps()).
 
-%% @doc Creates and renders the template with the provided name.
--spec render(list(), [{term(), term()}]) ->
-                {ok, binary()} | {error, atom()};
-            (list(), dtl_context:context()) ->
-                {ok, binary()} | {error, atom()}.
-render(Name, Ctx) ->
-    %% TODO: Switch on error condition.
-    {ok, Tpl} = dtl_loader:get_template(Name),
-    {ok, Out, _Ctx2} = dtl_template:render(Tpl, dtl_context:new(Ctx)),
-    {ok, Out}.
-
-%% @doc Find some setting, defaults to `undefined'.
--spec setting(atom()) -> term().
-setting(Name) ->
-    setting(Name, undefined).
-
-%% @doc Find some setting, or return the provided default.
--spec setting(atom(), term()) -> term().
-setting(Name, Default) ->
-    {ok, Mod} = application:get_env(dtl, settings_module),
-    Mod:setting(Name, Default).
+should_support_maps() ->
+    {match, [V]} = re:run(erlang:system_info(otp_release),
+                          "^R?([0-9]+).*$",
+                          [{capture, [1], list}]),
+    Version = string:to_integer(V),
+    Version >= 17.

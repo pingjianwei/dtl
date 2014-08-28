@@ -65,7 +65,13 @@ new() -> new([]).
 -spec new(list() | context()) -> context().
 %% Identity function when provided as context.
 new(Ctx) when is_record(Ctx, ctx) -> Ctx;
-new(PList) when is_list(PList) ->
+new(Ctx) ->
+    case dtl_support:is_map(Ctx) of
+        true -> from_plist(maps:to_list(Ctx));
+        false -> from_plist(Ctx)
+    end.
+
+from_plist(PList) ->
     Ctx = #ctx{render_context = #ctx{}},
     update(process_all(Ctx), PList).
 
