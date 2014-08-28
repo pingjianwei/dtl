@@ -61,7 +61,7 @@ context_processor_test() ->
 map_support_test() ->
     case dtl_support:maps() of
         true ->
-            Ctx = dtl_context:new(#{a => 1, b => 2}),
+            Ctx = dtl_context:new(maps:from_list([{a, 1}, {b, 2}])),
             ?assertEqual(1, dtl_context:fetch(Ctx, a)),
             ?assertEqual(2, dtl_context:fetch(Ctx, b)),
             ?assertEqual(undefined, dtl_context:fetch(Ctx, y));

@@ -38,8 +38,10 @@ render_test_() ->
                            dtl:render("included.html", [{o, 1}]))],
     Tests2 = case dtl_support:maps() of
         true ->
-            [?_assertEqual({ok, <<"2\n">>},
-                           dtl:render("included.html", #{o => 2}))|Tests];
+            T = ?_assertEqual({ok, <<"2\n">>},
+                              dtl:render("included.html",
+                                         maps:from_list([{o, 2}]))),
+            [T|Tests];
         false -> Tests
     end,
     {setup, fun setup/0, fun teardown/1, Tests2}.

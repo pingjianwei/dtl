@@ -31,5 +31,5 @@ should_support_maps() ->
     {match, [V]} = re:run(erlang:system_info(otp_release),
                           "^R?([0-9]+).*$",
                           [{capture, [1], list}]),
-    Version = string:to_integer(V),
+    {Version, _} = string:to_integer(V),
     Version >= 17.
