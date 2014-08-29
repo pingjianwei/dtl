@@ -36,6 +36,44 @@
 -include("test.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
+%% dtl_library (for {% load %} tests).
+registered_filters() -> [make_cat].
+registered_tags() -> [render_item, wc].
+
+%%
+%% Filters
+%%
+
+make_cat(_) -> {ok, <<"Cat">>}.
+
+%%
+%% Tags
+%%
+wc(Parser, _Token) ->
+    {ok, Nodes, Parser2} = dtl_parser:parse(Parser, [endwc]),
+    Node = dtl_node:new("wc", {?MODULE, wc_render}),
+    Node2 = dtl_node:set_nodelist(Node, Nodes),
+    {ok, Node2, dtl_parser:delete_first_token(Parser2)}.
+
+wc_render(Node, Ctx) ->
+    Out = dtl_node:render(dtl_node:nodelist(Node), Ctx),
+    In = binary_to_list(iolist_to_binary(Out)),
+    Wc = case re:run(In, "(?:^|\\b)\\w+(?:\\b|$)", [global]) of
+        nomatch -> 0;
+        {match, Ms} -> length(Ms)
+    end,
+    list_to_binary(integer_to_list(Wc)).
+
+render_item(Parser, Token) ->
+    [_, RawItem] = dtl_parser:split_token(Token),
+    Item = dtl_filter:parse(RawItem, Parser),
+    {ok, dtl_node:new("render_item", fun (_Node, Ctx) ->
+        Label = dtl_context:fetch(Ctx, item_label),
+        {ok, N, _Safe} = dtl_filter:resolve_expr(Item, Ctx),
+        ItemVal = list_to_binary(integer_to_list(N)),
+        <<"<p>", Label/binary, ": ", ItemVal/binary, "</p>">>
+     end), Parser}.
+
 load_tag_test_() ->
     ?COMPARE_TEMPLATES([
         {Out, <<"{% load dtl_default_library_tests %}", In/binary>>} ||
@@ -171,40 +209,15 @@ include_test_() ->
                            {o, 1}]),
     ?COMPARE_TEMPLATES(Tests, Ctx).
 
-%% dtl_library (for {% load %} tests).
-registered_filters() -> [make_cat].
-registered_tags() -> [render_item, wc].
-
-%%
-%% Filters
-%%
-
-make_cat(_) -> {ok, <<"Cat">>}.
-
-%%
-%% Tags
-%%
-wc(Parser, _Token) ->
-    {ok, Nodes, Parser2} = dtl_parser:parse(Parser, [endwc]),
-    Node = dtl_node:new("wc", {?MODULE, wc_render}),
-    Node2 = dtl_node:set_nodelist(Node, Nodes),
-    {ok, Node2, dtl_parser:delete_first_token(Parser2)}.
-
-wc_render(Node, Ctx) ->
-    Out = dtl_node:render(dtl_node:nodelist(Node), Ctx),
-    In = binary_to_list(iolist_to_binary(Out)),
-    Wc = case re:run(In, "(?:^|\\b)\\w+(?:\\b|$)", [global]) of
-        nomatch -> 0;
-        {match, Ms} -> length(Ms)
-    end,
-    list_to_binary(integer_to_list(Wc)).
-
-render_item(Parser, Token) ->
-    [_, RawItem] = dtl_parser:split_token(Token),
-    Item = dtl_filter:parse(RawItem, Parser),
-    {ok, dtl_node:new("render_item", fun (_Node, Ctx) ->
-        Label = dtl_context:fetch(Ctx, item_label),
-        {ok, N, _Safe} = dtl_filter:resolve_expr(Item, Ctx),
-        ItemVal = list_to_binary(integer_to_list(N)),
-        <<"<p>", Label/binary, ": ", ItemVal/binary, "</p>">>
-     end), Parser}.
+templatetag_test_() ->
+    ?COMPARE_TEMPLATES(
+        [{Out, list_to_binary(io_lib:format("{% templatetag ~p %}", [Tag]))} ||
+         {Out, Tag} <- [{<<"{%">>, openblock},
+                        {<<"%}">>, closeblock},
+                        {<<"{{">>, openvariable},
+                        {<<"}}">>, closevariable},
+                        {<<"{">>,  openbrace},
+                        {<<"}">>,  closebrace},
+                        {<<"{#">>, opencomment},
+                        {<<"#}">>, closecomment}]],
+        dtl_context:new()).

@@ -58,22 +58,23 @@
          upper/1]).
 
 %% Tags
--export([autoescape/2, render_autoescape/2,
-         block/2,      render_block/2,
+-export([autoescape/2,  render_autoescape/2,
+         block/2,       render_block/2,
          % No renderer
          comment/2,
-         extends/2,    render_extends/2,
-         include/2,    render_include/2,
-         firstof/2,    render_firstof/2,
-         for/2,        render_for/2,
-         'if'/2,       render_if/2,
-         ifchanged/2,  render_ifchanged/2,
+         cycle/2,       render_cycle/2,
+         extends/2,     render_extends/2,
+         firstof/2,     render_firstof/2,
+         for/2,         render_for/2,
+         'if'/2,        render_if/2,
+         ifchanged/2,   render_ifchanged/2,
          %% Shared renderer
          ifequal/2,
-         ifnotequal/2, render_ifequal/2,
+         ifnotequal/2,  render_ifequal/2,
          %% No renderer
          load/2,
-         cycle/2,      render_cycle/2]).
+         include/2,     render_include/2,
+         templatetag/2, render_templatetag/2]).
 
 %% {% if %} operators. All are binary except for <<"not">>, and all
 %% accept a context.
@@ -111,7 +112,8 @@ registered_tags() -> [autoescape,
                       ifequal,
                       ifnotequal,
                       include,
-                      load].
+                      load,
+                      templatetag].
 
 -define(BLOCK_CONTEXT_KEY, block_context).
 
@@ -854,3 +856,29 @@ render_include(Node, Ctx) ->
     Template = get_template(TemplateName, Ctx),
     {ok, Bin, Ctx2} = dtl_template:render(Template, Ctx),
     {Bin, Ctx2}.
+
+-define(TEMPLATETAGS,
+    [{openblock,     <<"{%">>},
+     {closeblock,    <<"%}">>},
+     {openvariable,  <<"{{">>},
+     {closevariable, <<"}}">>},
+     {openbrace,     <<"{">>},
+     {closebrace,    <<"}">>},
+     {opencomment,   <<"{#">>},
+     {closecomment,  <<"#}">>}]).
+
+templatetag(Parser, Token) ->
+    case dtl_parser:split_token(Token) of
+        [_Cmd, TagName] ->
+            Node = dtl_node:new("templatetag", {?MODULE, render_templatetag}),
+            Node2 = dtl_node:set_state(Node, TagName),
+            {ok, Node2, Parser};
+        _ ->
+            {error, {badarg, templatetag}}
+    end.
+
+render_templatetag(Node, Ctx) ->
+    TagName = dtl_node:state(Node),
+    {proplists:get_value(dtl_string:safe_list_to_atom(binary_to_list(TagName)),
+                         ?TEMPLATETAGS, <<>>),
+     Ctx}.

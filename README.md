@@ -238,7 +238,7 @@ Name|Implemented
 `regroup`|No
 `spaceless`|No
 `ssi`|No
-`templatetag`|No
+`templatetag`|Yes
 `url`|Won't support
 `verbatim`|Yes
 `widthratio`|No
