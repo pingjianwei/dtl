@@ -77,7 +77,7 @@ check: check-clean dtl
 	if [[ -n "$$f" ]] ; then \
 		echo ; echo "$$f" ; \
 		[[ "$$(uname)" = Darwin ]] \
-			&& open -aFirefox "$$f" \
+			&& open "file://$$PWD/$$f" \
 			|| (hash firefox 2> /dev/null \
 				&& firefox -new-window "file://$$PWD/$$f") ; \
 	fi )
