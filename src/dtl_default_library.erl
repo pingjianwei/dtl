@@ -53,6 +53,7 @@
          capfirst/1,
          escape/1,
          escapejs/1,
+         'length'/1,
          lower/1,
          safe/1,
          upper/1]).
@@ -96,6 +97,7 @@ registered_filters() -> [addslashes,
                          capfirst,
                          escape,
                          escapejs,
+                         'length',
                          lower,
                          safe,
                          upper].
@@ -183,6 +185,10 @@ safe(Bin) ->
 -spec upper(binary()) -> {ok, binary()}.
 upper(Bin) ->
     {ok, list_to_binary(ux_string:to_upper(binary_to_list(Bin)))}.
+
+'length'(L) ->
+    {ok, list_to_binary(integer_to_list(erlang:length(L)))}.
+
 
 %%
 %% Tags
@@ -483,7 +489,7 @@ if_token(V, Parser) ->
     end.
 
 move_next_token(Parser = #if_parser{tokens = Tokens, pos = Pos})
-        when length(Tokens) < Pos ->
+        when erlang:length(Tokens) < Pos ->
     Token = #if_cond_token{type = ending},
     Parser#if_parser{current = Token};
 move_next_token(Parser = #if_parser{tokens = Tokens, pos = Pos}) ->
@@ -691,7 +697,7 @@ render_for(Node, Ctx) ->
             ForCtx = dtl_context:fetch(Ctx, forloop, dtl_context:new()),
             ForCtx2 = dtl_context:set(ForCtx, parentloop, ParentLoop),
             Ctx4 = dtl_context:set(Ctx2, forloop, ForCtx2),
-            render_for_each(LoopNodes, From, Vars, length(From),
+            render_for_each(LoopNodes, From, Vars, erlang:length(From),
                             Reversed, Ctx4)
     end,
     {Bin, dtl_context:pop(Ctx3)}.
@@ -807,7 +813,7 @@ render_cycle(Node, Ctx) ->
         undefined -> 0;
         N -> N
     end,
-    Index2 = if length(Vals) =< Index -> 1; true -> Index + 1 end,
+    Index2 = if erlang:length(Vals) =< Index -> 1; true -> Index + 1 end,
     ForCtx2 = dtl_context:set(ForCtx, Ref, Index2),
     Ctx2 = dtl_context:set_ref(Ctx, forloop, ForCtx2),
     {ok, Val, _Safe} = dtl_filter:resolve_expr(lists:nth(Index2, Vals), Ctx2),

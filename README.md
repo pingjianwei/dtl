@@ -273,7 +273,7 @@ Name|Implemented
 `iriencode`|No
 `join`|No
 `last`|No
-`length`|No
+`length`|Yes
 `length_is`|No
 `linebreaks`|No
 `linebreaksbr`|No

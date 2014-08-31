@@ -105,7 +105,8 @@ filter_test_() ->
         {cat, <<"Cat">>},
         {quotes, <<"'\"\\">>},
         {tag, <<"<p>">>},
-        {test, <<"'test'">>}
+        {test, <<"'test'">>},
+        {l, [1, 2, 3]}
     ]),
     ?COMPARE_TEMPLATES([
         {<<"\\&#39;\\&quot;\\\\">>, <<"{{ quotes|addslashes }}">>},
@@ -117,7 +118,8 @@ filter_test_() ->
         {<<"3. &lt;p&gt;">>, <<"3. {{ tag|safe|escape }}">>},
         {<<"4. <p>">>, <<"4. {% autoescape off %}{{ tag }}{% endautoescape %}">>},
         {<<"5. &lt;p&gt;">>, <<"5. {% autoescape off %}{{ tag|escape }}{% endautoescape %}">>},
-        {<<"var s = '\\u0027test\\u0027';">>, <<"var s = '{{ test|escapejs }}';">>}
+        {<<"var s = '\\u0027test\\u0027';">>, <<"var s = '{{ test|escapejs }}';">>},
+        {<<"3">>, <<"{{ l|length }}">>}
     ], Ctx).
 
 comment_tag_test_() ->
