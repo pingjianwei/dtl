@@ -119,7 +119,8 @@ filter_test_() ->
         {<<"4. <p>">>, <<"4. {% autoescape off %}{{ tag }}{% endautoescape %}">>},
         {<<"5. &lt;p&gt;">>, <<"5. {% autoescape off %}{{ tag|escape }}{% endautoescape %}">>},
         {<<"var s = '\\u0027test\\u0027';">>, <<"var s = '{{ test|escapejs }}';">>},
-        {<<"3">>, <<"{{ l|length }}">>}
+        {<<"3">>, <<"{{ l|length }}">>},
+        {<<"[1,2,3]">>, <<"{{ l|pprint }}">>}
     ], Ctx).
 
 comment_tag_test_() ->

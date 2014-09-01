@@ -45,6 +45,7 @@
                        Node :: dtl_node:unode()}.
 -type if_cond_token() :: #if_cond_token{}.
 -type if_cond_type() :: infix | prefix | literal | ending.
+
 -export([registered_tags/0,
          registered_filters/0]).
 
@@ -56,6 +57,7 @@
          'length'/1,
          lower/1,
          safe/1,
+         pprint/1,
          upper/1]).
 
 %% Tags
@@ -99,6 +101,7 @@ registered_filters() -> [addslashes,
                          escapejs,
                          'length',
                          lower,
+                         pprint,
                          safe,
                          upper].
 
@@ -189,6 +192,13 @@ upper(Bin) ->
 'length'(L) ->
     {ok, list_to_binary(integer_to_list(erlang:length(L)))}.
 
+pprint(V) ->
+    %% io_lib_pretty is undocumented and probably unsupported
+    Pp = case erlang:function_exported(io_lib_pretty, print, 1) of
+        true -> io_lib_pretty:print(V);
+        false -> io_lib:format("~p", [V])
+    end,
+    {ok, list_to_binary(Pp)}.
 
 %%
 %% Tags
