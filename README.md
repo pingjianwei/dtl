@@ -283,7 +283,7 @@ Name|Implemented
 `make_list`|No
 `phone2numeric`|No
 `pluralize`|No
-`pprint`|No
+`pprint`|Yes
 `random`|No
 `removetags`|No
 `rjust`|No
