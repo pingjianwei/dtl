@@ -40,7 +40,7 @@
     id :: binary()
 }).
 
--type block_context() :: dict().
+-type block_context() :: dict:dict().
 -type block_spec() :: {Name :: list(),
                        Node :: dtl_node:unode()}.
 -type if_cond_token() :: #if_cond_token{}.
@@ -392,7 +392,7 @@ block_context(RenderCtx) ->
         BlockCtx -> {BlockCtx, RenderCtx}
     end.
 
--spec add_blocks(dict(), [block_spec()]) -> dict().
+-spec add_blocks(dict:dict(), [block_spec()]) -> dict:dict().
 add_blocks(BlockCtx, [{Name, Node}|Specs]) ->
     Existing = case dict:find(Name, BlockCtx) of
         error -> [];
