@@ -49,7 +49,7 @@
 %% of the program, so that updates to the context data consist of
 %% pushing to the stack rather than destroying existing data.
 -record(ctx, {
-    stack = [] :: [dtl_compat:dict()],
+    stack = [] :: [dtl_compat:compat_dict()],
     autoescape = true :: boolean(),
     render_context %% :: context() -- Dialyzer does not handle this
                    %%                 specification properly.
