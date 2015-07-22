@@ -850,9 +850,9 @@ render_firstof(Node, Ctx) ->
     case lists:dropwhile(fun (V) ->
             V =:= false orelse V =:= undefined
         end, Vals) of
-        [H|T] ->
+        [H|_] ->
             {[H], Ctx};
-        O ->
+        _ ->
             {<<>>, Ctx}
     end.
 
