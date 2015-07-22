@@ -51,11 +51,11 @@ all: deps dtl
 	chmod +x ./rebar
 
 
-get-deps: rebar.config
-	$(REBAR) get-deps
+get-deps: $(REBAR) rebar.config
+	@$(REBAR) get-deps
 
-deps: get-deps
-	$(REBAR) compile
+deps: $(REBAR) get-deps
+	@$(REBAR) compile
 
 MAIN_ERLS = $(shell find src -name '*.erl' -not -name '*tests.erl')
 
@@ -68,11 +68,11 @@ CT_SUITES = eunit_SUITE
 
 TEST_APP = test/eunit_SUITE_data/test_app
 
-dtl:
-	$(REBAR) compile skip_deps=true
+dtl: $(REBAR)
+	@$(REBAR) compile skip_deps=true
 
-clean: check-clean doc-clean
-	$(REBAR) clean skip_deps=true
+clean: $(REBAR) check-clean doc-clean
+	@$(REBAR) clean skip_deps=true
 	$(MAKE) -C $(TEST_APP) clean
 
 check: check-clean dtl
