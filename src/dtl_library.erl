@@ -26,7 +26,7 @@
 -module(dtl_library).
 
 -type name() :: atom().
--type library() :: dict().
+-type library() :: dtl_compat:compat_dict().
 -type filter_spec() :: name().
 -type tag_spec() :: name()
                   | {{module(), atom()}, name()}
@@ -45,7 +45,7 @@
 
 %% @doc Update the filters dict with all filters registered to the
 %%      specified `dtl_library' callback module.
--spec add_filters(module(), dict()) -> dict().
+-spec add_filters(module(), dtl_compat:compat_dict()) -> dtl_compat:compat_dict().
 add_filters(Mod, Filters) ->
     lists:foldl(fun (Filter, Dict) ->
         dict:store(Filter, {Mod, Filter}, Dict)
@@ -53,7 +53,7 @@ add_filters(Mod, Filters) ->
 
 %% @doc Update the tags dict with all tags registered to the specified
 %%      `dtl_library' callback module.
--spec add_tags(module(), dict()) -> dict().
+-spec add_tags(module(), dtl_compat:compat_dict()) -> dtl_compat:compat_dict().
 add_tags(Mod, Tags) ->
     lists:foldl(fun (UserTagSpec, Dict) ->
         {Name, Tag} = convert_user_tag_spec(Mod, UserTagSpec),

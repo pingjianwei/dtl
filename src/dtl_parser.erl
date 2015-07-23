@@ -26,8 +26,8 @@
 -include("compiler.hrl").
 
 -record(parser, {tokens :: [dtl_lexer:token()],
-                 tags :: dict(),
-                 filters :: dict(),
+                 tags :: dtl_compat:compat_dict(),
+                 filters :: dtl_compat:compat_dict(),
                  blocks = [] :: [binary()]}).
 -opaque parser() :: #parser{}.
 
