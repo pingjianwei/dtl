@@ -1,12 +1,9 @@
 -module(dtl_compat).
 
--export_type([compat_queue/0, compat_dict/0]).
+-export_type([compat_dict/0]).
 
-
--ifdef(otp_18).
--type compat_queue() :: queue:queue().
--type compat_dict()  :: dict:dict().
+-ifdef(dict_0).
+-type compat_dict() :: dict().
 -else.
--type compat_queue() :: queue().
--type compat_dict()  :: dict().
+-type compat_dict() :: dict:dict().
 -endif.
