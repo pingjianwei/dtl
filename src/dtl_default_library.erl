@@ -54,6 +54,7 @@
          capfirst/1,
          escape/1,
          escapejs/1,
+         join/2,
          'length'/1,
          lower/1,
          safe/1,
@@ -99,6 +100,7 @@ registered_filters() -> [addslashes,
                          capfirst,
                          escape,
                          escapejs,
+                         join,
                          'length',
                          lower,
                          pprint,
@@ -173,6 +175,25 @@ escape(Bin) ->
 -spec escapejs(binary()) -> {ok, binary()}.
 escapejs(Bin) ->
     {ok, dtl_string:escape_js(Bin)}.
+
+%% @doc Joins the provided string list by the provided separator. Separator
+%%      should be a binary. The list should be a list of strings (lists), but
+%%      non-list args are coerced.
+-spec join(any(), binary()) -> {ok, binary()}.
+join(List, Sep) when is_list(List) ->
+    Parts = lists:map(fun any_to_list/1, List),
+    {ok, list_to_binary(string:join(Parts, binary_to_list(Sep)))};
+join(undefined, _) ->
+    {ok, <<>>};
+join(_, _) ->
+    {error, join_list}.
+
+any_to_list(V) when is_list(V)    -> V;
+any_to_list(V) when is_binary(V)  -> binary_to_list(V);
+any_to_list(V) when is_integer(V) -> integer_to_list(V);
+any_to_list(V) when is_float(V)   -> float_to_list(V, [{decimals, 2}, compact]);
+any_to_list(V) when is_atom(V)    -> atom_to_list(V);
+any_to_list(V)                    -> io_lib:format("~p", [V]).
 
 %% @doc Converts upper to lowercase. {{ "FOO"|lower }} -> "foo".
 -spec lower(binary()) -> {ok, binary()}.

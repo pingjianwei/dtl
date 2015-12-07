@@ -5,3 +5,5 @@ doc
 logs
 test/*.beam
 .dtl.plt
+/.rebar
+/rebar

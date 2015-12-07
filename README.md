@@ -271,7 +271,7 @@ Name|Implemented
 `force_escape`|No
 `get_digit`|No
 `iriencode`|No
-`join`|No
+`join`|Yes
 `last`|No
 `length`|Yes
 `length_is`|No

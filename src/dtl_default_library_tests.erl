@@ -224,3 +224,21 @@ templatetag_test_() ->
                         {<<"{#">>, opencomment},
                         {<<"#}">>, closecomment}]],
         dtl_context:new()).
+
+join_test_() ->
+    Tests = [{<<"1,2.0,3">>, <<"{{ l|join:\",\" }}">>},
+             {<<>>, <<"{{ empty|join:\",\" }}">>},
+             {<<"a,b,c">>, <<"{{ l2|join:\",\" }}">>},
+             {<<"{a,b};{b,c}">>, <<"{{ l3|join:\";\" }}">>},
+
+             %% Expect strange output if joining a list of non-string lists.
+             %% Pass in a list of binaries to be avoid this when dealing with
+             %% potential garbage data.
+             {<<1, 2, 3, $;, 4, 5, 6>>, <<"{{ l4|join:\";\" }}">>}],
+
+    Ctx = dtl_context:new([{l, [1, 2.0, 3]},
+                           {l2, [<<"a">>, "b", c]},
+                           {l3, [{a, b}, {b, c}]},
+                           {l4, [[1, 2, 3], [4, 5, 6]]},
+                           {empty, []}]),
+    ?COMPARE_TEMPLATES(Tests, Ctx).
