@@ -225,8 +225,14 @@ templatetag_test_() ->
                         {<<"#}">>, closecomment}]],
         dtl_context:new()).
 
+-ifdef(float_to_list_1).
+-define(FLOAT_OUT, "2.00").
+-else.
+-define(FLOAT_OUT, "2.0").
+-endif.
+
 join_test_() ->
-    Tests = [{<<"1,2.0,3">>, <<"{{ l|join:\",\" }}">>},
+    Tests = [{<<"1,", ?FLOAT_OUT, ",3">>, <<"{{ l|join:\",\" }}">>},
              {<<>>, <<"{{ empty|join:\",\" }}">>},
              {<<"a,b,c">>, <<"{{ l2|join:\",\" }}">>},
              {<<"{a,b};{b,c}">>, <<"{{ l3|join:\";\" }}">>},

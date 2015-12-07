@@ -191,7 +191,8 @@ join(_, _) ->
 any_to_list(V) when is_list(V)    -> V;
 any_to_list(V) when is_binary(V)  -> binary_to_list(V);
 any_to_list(V) when is_integer(V) -> integer_to_list(V);
-any_to_list(V) when is_float(V)   -> float_to_list(V, [{decimals, 2}, compact]);
+any_to_list(V) when is_float(V)   ->
+    dtl_compat:float_to_list(V, [{decimals, 2}, compact]);
 any_to_list(V) when is_atom(V)    -> atom_to_list(V);
 any_to_list(V)                    -> io_lib:format("~p", [V]).
 
