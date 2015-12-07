@@ -4,7 +4,7 @@
 
 A full-featured port of the Django template engine to Erlang.
 
-Tested and supported for Erlang/OTP versions R15B-18.0.
+Tested and supported for Erlang/OTP versions R15B-18.1.
 
     Warning: The template engine is in a working but still "alpha"
     state, particularly until error handling is cleaned up.
