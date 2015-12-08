@@ -50,7 +50,8 @@
          registered_filters/0]).
 
 %% Filters
--export([addslashes/1,
+-export([add/2,
+         addslashes/1,
          capfirst/1,
          escape/1,
          escapejs/1,
@@ -96,7 +97,8 @@
          if_not_in/3,
          if_or/3]).
 
-registered_filters() -> [addslashes,
+registered_filters() -> [add,
+                         addslashes,
                          capfirst,
                          escape,
                          escapejs,
@@ -150,6 +152,36 @@ registered_tags() -> [autoescape,
 %% Filters
 %%
 
+add(LOp, ROp) ->
+    Out = case [add_term(Op) || Op <- [LOp, ROp]] of
+        [L, R] when is_number(L) andalso is_number(R) ->
+            L + R;
+        [L, R] when is_list(L) andalso is_list(R) ->
+            L ++ R;
+        [_, _] -> <<>>
+    end,
+    {ok, Out}.
+
+add_term(V) when is_binary(V) ->
+    add_term(binary_to_list(V));
+add_term(V) when is_list(V) ->
+    case safe_list_to_number(V) of
+        {ok, N} -> N;
+        _ -> V
+    end;
+add_term(V) -> V.
+
+safe_list_to_number(L) ->
+    try
+        {ok, list_to_integer(L)}
+    catch _:_ ->
+        try
+            {ok, list_to_float(L)}
+        catch _:_ ->
+            error
+        end
+    end.
+
 %% @doc Adds backslash prefix to single quotes, double quotes, and
 %%      backslashes. {{ "'\"\\" }} -> "\\'\\\"\\\\".
 -spec addslashes(binary()) -> {ok, binary()}.
@@ -180,21 +212,13 @@ escapejs(Bin) ->
 %%      should be a binary. The list should be a list of strings (lists), but
 %%      non-list args are coerced.
 -spec join(any(), binary()) -> {ok, binary()}.
-join(List, Sep) when is_list(List) ->
-    Parts = lists:map(fun any_to_list/1, List),
+join(L, Sep) when is_list(L) ->
+    Parts = [binary_to_list(dtl_node:var_to_binary(E)) || E <- L],
     {ok, list_to_binary(string:join(Parts, binary_to_list(Sep)))};
 join(undefined, _) ->
     {ok, <<>>};
 join(_, _) ->
     {error, join_list}.
-
-any_to_list(V) when is_list(V)    -> V;
-any_to_list(V) when is_binary(V)  -> binary_to_list(V);
-any_to_list(V) when is_integer(V) -> integer_to_list(V);
-any_to_list(V) when is_float(V)   ->
-    dtl_compat:float_to_list(V, [{decimals, 2}, compact]);
-any_to_list(V) when is_atom(V)    -> atom_to_list(V);
-any_to_list(V)                    -> io_lib:format("~p", [V]).
 
 %% @doc Converts upper to lowercase. {{ "FOO"|lower }} -> "foo".
 -spec lower(binary()) -> {ok, binary()}.

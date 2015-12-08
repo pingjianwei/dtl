@@ -115,7 +115,7 @@ process_matches([[_, _, RawName, ConstArg, VarArg]|Matches], Var,
                         {Const, <<>>} -> [{false, process_string(Const)}];
                         {<<>>, Var2} ->
                             Var3 = process_var(Var2),
-                            [{is_list(Var3), Var2}]
+                            [{is_list(Var3), Var3}]
                     end,
                     Filter = {FilterFun, Args},
                     process_matches(Matches, Var, [Filter|Filters], Parser)
@@ -134,7 +134,7 @@ process_string(Bin) ->
     end.
 
 %% Process a raw Erlang term.
--spec process_term(binary()) -> term() | {error, invalid_constant}.
+-spec process_term(binary()) -> term() | {error, invalid_term}.
 process_term(Const) ->
     case erl_scan:string(binary_to_list(Const)) of
         {ok, [{_Type, _Pos, Term}], _Loc} -> Term;

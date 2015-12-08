@@ -62,7 +62,8 @@
          set_nodelist/2,
          set_renderer/2,
          set_state/2,
-         state/1]).
+         state/1,
+         var_to_binary/1]).
 -export_type([escape_spec/0,
               tnode/0,
               unode/0]).
@@ -164,9 +165,14 @@ render_in_context(Var, Ctx, Safe) ->
     end.
 
 -spec var_to_binary(term()) -> binary().
-var_to_binary(undefined) -> dtl:setting(empty_term_replacement);
+var_to_binary(undefined) -> var_to_binary(dtl:setting(empty_term_replacement));
 var_to_binary(T) when is_binary(T) -> T;
-var_to_binary(T) -> list_to_binary(io_lib:format("~w", [T])).
+var_to_binary(T) -> list_to_binary(var_to_list(T)).
+
+var_to_list(T) when is_integer(T) -> integer_to_list(T);
+var_to_list(T) when is_float(T) ->
+    dtl_compat:float_to_list(T, [{decimals, 2}, compact]);
+var_to_list(T) -> io_lib:format("~W", [T, 10]).
 
 %% @doc Get all nodes with a given name within a certain node.
 -spec get_nodes_by_type(tnode(), atom()) -> [unode()].
