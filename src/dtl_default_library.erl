@@ -165,22 +165,11 @@ add(LOp, ROp) ->
 add_term(V) when is_binary(V) ->
     add_term(binary_to_list(V));
 add_term(V) when is_list(V) ->
-    case safe_list_to_number(V) of
+    case dtl_string:safe_list_to_number(V) of
         {ok, N} -> N;
         _ -> V
     end;
 add_term(V) -> V.
-
-safe_list_to_number(L) ->
-    try
-        {ok, list_to_integer(L)}
-    catch _:_ ->
-        try
-            {ok, list_to_float(L)}
-        catch _:_ ->
-            error
-        end
-    end.
 
 %% @doc Adds backslash prefix to single quotes, double quotes, and
 %%      backslashes. {{ "'\"\\" }} -> "\\'\\\"\\\\".

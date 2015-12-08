@@ -27,6 +27,7 @@
          escape_js/1,
          escape_re/1,
          safe_list_to_atom/1,
+         safe_list_to_number/1,
          smart_split/1]).
 
 %% Regex for splitting block tag tokens.
@@ -114,4 +115,15 @@ safe_list_to_atom(L) ->
         A -> A
     catch
         _:_ -> error
+    end.
+
+safe_list_to_number(L) ->
+    try
+        {ok, list_to_integer(L)}
+    catch _:_ ->
+        try
+            {ok, list_to_float(L)}
+        catch _:_ ->
+            error
+        end
     end.
