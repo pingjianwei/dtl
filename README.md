@@ -34,7 +34,7 @@ filter/tag set included in Django.
 To install the latest version, add this to your dependency list in
 rebar.config:
 
-    {dtl, ".*", {git, "git://github.com/oinksoft/dtl.git", "master"}}
+    {dtl, ".*", {git, "git://github.com/oinksoft/dtl.git", {branch, "master"}}}
 
 and run `rebar get-deps`, then `rebar compile`. Refer to the [rebar
 documentation](https://github.com/basho/rebar) if this is unclear.
