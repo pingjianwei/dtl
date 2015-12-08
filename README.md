@@ -6,14 +6,6 @@ A full-featured port of the Django template engine to Erlang.
 
 Tested and supported for Erlang/OTP versions R15B-18.1.
 
-    Warning: The template engine is in a working but still "alpha"
-    state, particularly until error handling is cleaned up.
-
-    The custom tag and filter API works as do all rendering and lookup
-    functions. See "#7. Built-in Tags and Filters" for an up-to-date
-    table documenting tag and filter compatibility with the Django
-    defaults.
-
 API Documentation: [http://oinksoft.github.io/dtl/](http://oinksoft.github.io/dtl/)
 
 1. [Introduction](#1-introduction)
@@ -251,7 +243,7 @@ Name|Implemented
 
 Name|Implemented
 ---|---
-`add`|No
+`add`|Yes
 `addslashes`|Yes
 `capfirst`|Yes
 `center`|Yes
