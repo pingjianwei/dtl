@@ -19,36 +19,27 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# Run this Makefile with a copy of GNU Make:
-#     <http://www.gnu.org/software/make/>
-#
+# Run this Makefile with a copy of GNU Make!
+# <http://www.gnu.org/software/make/>
+
 # Targets:
-#     all (dtl): Compile DTL's erlang sources.
-#     check (test, ct): Run DTL's test suite.
+#     build: Compile DTL's erlang sources.
+#     check: Run DTL's test suite.
 #     deps: Install all dependencies (requires `rebar').
+#     dialyze: Run Dialyzer over the codebase, checking types and things.
 #     doc: Build EDoc.
-#     dialyze (dia): Run Dialyzer over the codebase, checking types and
-#         things.
 #     get-deps: Only download dependencies, don't build them.
 #     plt: Build files necessary for running `dialyze'.
 #
 # Options:
-#     DIALYZER: The path to the Dialyzer executable.
-#     CT_RUN: The path to the Common Test executable.
+#     CT_BROWSER: A browser to display Common Test errors.
 #     CT_FLAGS: Extra options for Common Test.
+#     CT_RUN: The path to the Common Test executable.
+#     DIALYZER: The path to the Dialyzer executable.
 
 SHELL := bash
-PROGRAM = dtl
 REBAR ?= rebar
 DEPS = deps
-
-all: deps dtl
-
-get-deps: $(REBAR) rebar.config
-	$(REBAR) get-deps
-
-deps: $(REBAR) get-deps
-	$(REBAR) compile
 
 MAIN_ERLS = $(shell find src -name '*.erl' -not -name '*tests.erl')
 
@@ -56,52 +47,49 @@ DIALYZER ?= dialyzer
 DIALYZER_FLAGS ?=
 
 CT_RUN ?= ct_run
+CT_BROWSER ?= links
 CT_FLAGS = -pa $(TEST_APP)/ebin -pa $(DEPS)/*/ebin
-CT_SUITES = eunit_SUITE
 
 TEST_APP = test/eunit_SUITE_data/test_app
 
-dtl: $(REBAR)
+all: deps build
+
+get-deps: rebar.config
+	$(REBAR) get-deps
+
+deps: get-deps
+	$(REBAR) compile
+
+build:
 	$(REBAR) compile skip_deps=true
 
-clean: $(REBAR) check-clean doc-clean
-	$(REBAR) clean skip_deps=true
-	$(MAKE) -C $(TEST_APP) clean
-
-check: check-clean dtl
+check: check-clean build
 	$(MAKE) -C $(TEST_APP)
 	mkdir -p logs
-	$(CT_RUN) $(EFLAGS) $(CT_FLAGS) -pa ebin \
-		-I include -dir test -logdir logs -suite $(CT_SUITES) \
-		|| ( f="$$(find logs -name eunit_suite.eunit.html | head -1)" ; \
-	if [[ -n "$$f" ]] ; then \
-		echo ; echo "$$f" ; \
-		[[ "$$(uname)" = Darwin ]] \
-			&& open "file://$$PWD/$$f" \
-			|| (hash firefox 2> /dev/null \
-				&& firefox -new-window "file://$$PWD/$$f") ; \
-	fi )
-ct: check
-test: check
-
-check-clean:
-	rm -rf logs
+	$(CT_RUN) $(EFLAGS) $(CT_FLAGS) -pa ebin -I include -dir test -logdir logs \
+		-suite eunit_SUITE \
+		|| $(CT_BROWSER) "file://$$(find logs -name eunit_suite.eunit.html | head -1)"
 
 doc:
 	mkdir -p doc
 	./edoc.escript
 
-doc-clean:
-	rm -rf doc
-
 plt:
-	$(DIALYZER) --build_plt --output_plt .$(PROGRAM).plt \
+	$(DIALYZER) --build_plt --output_plt .dtl.plt \
 		--apps kernel stdlib
 
 dialyze:
 	$(DIALYZER) $(DIALYZER_FLAGS) --apps $(DEPS)/*/ebin \
-		--src $(MAIN_ERLS) --plt .$(PROGRAM).plt --no_native
-dia: dialyze
+		--src $(MAIN_ERLS) --plt .dtl.plt --no_native
 
-.PHONY: all dtl clean check ct test check-clean doc doc-clean plt \
-	dialyze dia
+clean: check-clean doc-clean
+	$(REBAR) clean skip_deps=true
+	$(MAKE) -C $(TEST_APP) clean
+
+check-clean:
+	rm -rf logs
+
+doc-clean:
+	rm -rf doc
+
+.PHONY: all build clean check check-clean doc doc-clean plt dialyze
