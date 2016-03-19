@@ -30,7 +30,7 @@
 
 %% In lieu of implementing float_to_list/2 for R15*
 -ifdef(float_to_list_1).
--define(FLOAT_OUT(F), (list_to_binary(F ++ "0"))).
+-define(FLOAT_OUT(F), list_to_binary(F ++ "0")).
 -else.
 -define(FLOAT_OUT(F), list_to_binary(F)).
 -endif.
