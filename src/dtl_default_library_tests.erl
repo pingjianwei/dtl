@@ -225,14 +225,9 @@ templatetag_test_() ->
                         {<<"#}">>, closecomment}]],
         dtl_context:new()).
 
--ifdef(float_to_list_1).
--define(FLOAT_OUT, "2.00").
--else.
--define(FLOAT_OUT, "2.0").
--endif.
-
 join_test_() ->
-    Tests = [{<<"1,", ?FLOAT_OUT, ",3">>, <<"{{ l|join:\",\" }}">>},
+    S = ?FLOAT_OUT("2.0"),
+    Tests = [{<<"1,", S/binary, ",3">>, <<"{{ l|join:\",\" }}">>},
              {<<>>, <<"{{ empty|join:\",\" }}">>},
              {<<"a,b,c">>, <<"{{ l2|join:\",\" }}">>},
              {<<"{a,b};{b,c}">>, <<"{{ l3|join:\";\" }}">>},
@@ -248,7 +243,7 @@ join_test_() ->
 add_test_() ->
     Tests = [{<<"8">>, <<"{{ x|add:y }}">>},
              {<<"-2">>, <<"{{ \"-1\"|add:\"-1\" }}">>},
-             {<<"6.8">>, <<"{{ z|add:\"-0.1\" }}">>},
+             {?FLOAT_OUT("6.8"), <<"{{ z|add:\"-0.1\" }}">>},
              {<<"[1,2,3,4,5,6]">>, <<"{{ l|add:l2 }}">>}],
     Ctx = dtl_context:new([{x, 3}, {y, 5}, {z, 6.9},
                            {l, [1, 2 ,3]},
