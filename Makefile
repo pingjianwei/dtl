@@ -39,17 +39,10 @@
 
 SHELL := bash
 PROGRAM = dtl
-REBAR ?= ./rebar
+REBAR ?= rebar
 DEPS = deps
 
 all: deps dtl
-
-./rebar:
-	erl -noshell -s inets start -s ssl start \
-		-eval 'httpc:request(get, {"https://raw.github.com/wiki/rebar/rebar/rebar", []}, [], [{stream, "./rebar"}])' \
-		-s inets stop -s init stop
-	chmod +x ./rebar
-
 
 get-deps: $(REBAR) rebar.config
 	$(REBAR) get-deps
