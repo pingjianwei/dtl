@@ -131,6 +131,8 @@ comment_tag_test_() ->
 if_tag_test_() ->
     Tests = [{<<"true">>, <<"{% if 1 > 0 %}true{% endif %}">>},
              {<<"Else">>, <<"{% if 1 < 0 %}If{% else %}Else{% endif %}">>},
+             {<<"If">>, <<"{% if c %}If{% else %}Else{% endif %}">>},
+             {<<"Else">>, <<"{% if not c %}If{% else %}Else{% endif %}">>},
              {<<"eq">>, <<"{% if 2 =:= 2 %}eq{% endif %}">>},
              {<<"eq">>, <<"{% if a == b %}eq{% endif %}">>},
              {<<"1">>, <<"{% if 1 %}1{% endif %}">>},

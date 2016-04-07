@@ -583,14 +583,14 @@ do_render_if([{undefined, Nodes}|Conds], Ctx, Rendered) ->
     {ok, Bin, Ctx2} = dtl_node:render_list(Nodes, Ctx),
     do_render_if(Conds, Ctx2, [Bin|Rendered]);
 do_render_if([{Cond, Nodes}|Conds], Ctx, Rendered) ->
-    {Rendered2, Ctx2} = case if_true(if_eval_cond(Cond, Ctx)) of
+    {Conds2, Ctx2, Rendered2} = case if_true(if_eval_cond(Cond, Ctx)) of
         true ->
             {ok, Bin, Ctx3} = dtl_node:render_list(Nodes, Ctx),
-            {[Bin|Rendered], Ctx3};
+            {[], Ctx3, [Bin|Rendered]};
         false ->
-            {Rendered, Ctx}
+            {Conds, Ctx, Rendered}
     end,
-    do_render_if(Conds, Ctx2, Rendered2);
+    do_render_if(Conds2, Ctx2, Rendered2);
 do_render_if([], _Ctx, Rendered) ->
     lists:reverse(Rendered).
 
