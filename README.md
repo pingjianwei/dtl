@@ -34,7 +34,9 @@ filter/tag set included in Django.
 To install the latest version, add this to your dependency list in
 rebar.config:
 
-    {dtl, ".*", {git, "git://github.com/oinksoft/dtl.git", {branch, "master"}}}
+```erlang
+{dtl, ".*", {git, "git://github.com/oinksoft/dtl.git", {branch, "master"}}}
+```
 
 and run `rebar get-deps`, then `rebar compile`. Refer to the [rebar
 documentation](https://github.com/basho/rebar) if this is unclear.
@@ -42,7 +44,9 @@ documentation](https://github.com/basho/rebar) if this is unclear.
 The `dtl` application must be started for the engine to work at all.
 Include this in your application so that it is run before you use `dtl`:
 
-    ok = application:start(dtl).
+```erlang
+ok = application:start(dtl).
+```
 
 Right now this might seem funny because DTL is mostly a library
 application, but it is needed for application config to work. It also
@@ -70,7 +74,9 @@ The defaults in the above table are all defined at this level.
 
 Users can look up settings with `dtl:setting/1`:
 
-    Apps = dtl:setting(apps).
+```erlang
+Apps = dtl:setting(apps).
+```
 
 It is not a good idea to change settings at runtime, but use a custom
 settings module if you need this functionality and still be aware of
@@ -79,10 +85,8 @@ potential race conditions.
 
 ###3.1 Settings Modules
 
-_Note: This functionality is unnecessary for the vast majority of users.
-It is far more convenient to simply rely on the default settings module
-and set the application environment variables described in the previous
-section._
+_Most users won't need to use this. The default settings module (application
+env) is suitable for most uses._
 
 Settings modules are modules that implement the `dtl_settings`
 behaviour. This module defines one callback, `setting/0`. They are
@@ -95,15 +99,17 @@ idea for user-defined settings modules to defer to
 an example of a settings module that overrides the `template_dirs`
 setting:
 
-    -module(news_settings).
-    -behaviour(dtl_settings).
+```erlang
+-module(news_settings).
+-behaviour(dtl_settings).
 
-    -export([setting/2]).
+-export([setting/2]).
 
-    setting(template_dirs, _Default) ->
-        ["/tmp/templates"];
-    setting(Key, Default) ->
-        dtl_app_config_settings:setting(Key, Default).
+setting(template_dirs, _Default) ->
+    ["/tmp/templates"];
+setting(Key, Default) ->
+    dtl_app_config_settings:setting(Key, Default).
+```
 
 You can see another example with `dtl_ets_settings`, which is only used
 for DTL tests.
@@ -118,41 +124,48 @@ your template files.
 
 Render a template:
 
-    {ok, Html} = dtl:render("index.html", #{
-        title => "The World Wide Web",
-        visitor_count => 12
-    }).
+```erlang
+{ok, Html} = dtl:render("index.html", #{
+    title => "The World Wide Web",
+    visitor_count => 12
+}).
+```
 
 Property lists are also supported, if your version of Erlang does not support
 maps.
 
-    {ok, Html} = dtl:render("index.html", [
-        {title, "The World Wide Web"},
-        {visitor_count, 12}
-    ]).
+```erlang
+{ok, Html} = dtl:render("index.html", [
+    {title, "The World Wide Web"},
+    {visitor_count, 12}
+]).
+```
 
 Create a template from a string, create a plain context with one item
 set, and render it:
 
-    Source = "My name is {{ name }}.",
-    {ok, Tpl} = dtl_template:new(Source),
-    Ctx = dtl_context:new([
-        {name, "Lawrence"}
-    ]),
-    {ok, <<"My name is Lawrence">>} = dtl_template:render(Tpl, Ctx).
+```erlang
+Source = "My name is {{ name }}.",
+{ok, Tpl} = dtl_template:new(Source),
+Ctx = dtl_context:new([
+    {name, "Lawrence"}
+]),
+{ok, <<"My name is Lawrence">>} = dtl_template:render(Tpl, Ctx).
+```
 
 Find a template and render it:
 
-    Tpl = dtl_loader:get_template("index.html"),
-    {ok, Html} = dtl_template:render(Tpl),
-    %% ...
+```erlang
+Tpl = dtl_loader:get_template("index.html"),
+{ok, Html} = dtl_template:render(Tpl),
+```
 
 Render the first of several found templates:
 
-    Tpl = dtl_loader:select_template(["index.html", "index.htm"]),
-    {ok, Html} = dtl_template:render(Tpl),
-    %% ...
-
+```erlang
+Tpl = dtl_loader:select_template(["index.html", "index.htm"]),
+{ok, Html} = dtl_template:render(Tpl),
+```
 
 ##5. Syntax
 
@@ -167,16 +180,20 @@ Contexts are the primary means of transmitting data from application
 code to Django templates. Any value that is accessible on a context
 will be accessible in any template into which the context is loaded:
 
-    Ctx = dtl_context:new([
-        {foo, "Foo"},
-        {bar, "Bar"}
-    ]),
-    {ok, Bin} = dtl:render(Tpl, Ctx).
+```erlang
+Ctx = dtl_context:new([
+    {foo, "Foo"},
+    {bar, "Bar"}
+]),
+{ok, Bin} = dtl:render(Tpl, Ctx).
+```
 
 `dtl:render/2` automatically wraps its context argument, so you need not provide
 a context explicitly as in the last example:
 
-    {ok, Bin} = dtl:render(Tpl, #{foo => "Foo", bar => "Bar"}).
+```erlang
+{ok, Bin} = dtl:render(Tpl, #{foo => "Foo", bar => "Bar"}).
+```
 
 ###6.1. Context Processors
 
@@ -186,15 +203,19 @@ property list (maps support is in the works).
 
 Here is an example context processor:
 
-    process_time() ->
-        Time = calendar:local_time(),
-        [{Year, Month, Day}, {Hours, Minutes, Seconds}] = Time,
-        [{date, io_lib:format("~p-~p-~p", [Year, Month, Day])},
-         {time, io_lib:format("~p:~p:~p", [Hours, Minutes, Seconds])}].
+```erlang
+process_time() ->
+    Time = calendar:local_time(),
+    [{Year, Month, Day}, {Hours, Minutes, Seconds}] = Time,
+    [{date, io_lib:format("~p-~p-~p", [Year, Month, Day])},
+     {time, io_lib:format("~p:~p:~p", [Hours, Minutes, Seconds])}].
+```
 
 Context processors are specified in application config.
 
-    application:set_env(dtl, context_processors, [{my_app, process_time}]).
+```erlang
+application:set_env(dtl, context_processors, [{my_app, process_time}]).
+```
 
 Now, a template could access `time` and `date` variables.
 
@@ -317,47 +338,48 @@ DTL comes with two template loader modules, which are described here:
     foo/priv/templates/index.html if `foo` were included in the `apps`
     configuration option.
 
-You can also implement your own loaders. Here is a loader that tries to
-copy a template from a web service (!):
+You can also implement your own loaders. Here is an HTTP loader:
 
-    -module(http_loader).
-    -behaviour(dtl_loader).
+```erlang
+-module(http_loader).
+-behaviour(dtl_loader).
 
-    -define(BASE_URL, "http://example.com/?img_name=").
+-define(BASE_URL, "http://example.com/?img_name=").
 
-    -export([is_usable/0,
-             load_template_source/1,
-             load_template_source/2]).
+-export([is_usable/0,
+         load_template_source/1,
+         load_template_source/2]).
 
-    %% A loader must implement is_usable/0. This callback is so that
-    %% loaders that are only useful in certain environments (say, a
-    %% memcached-backed loader) are not used.
-    %%
-    %% For instance, this function could test to see if ?BASE_URL's host
-    %% is reachable.
-    is_usable() -> true.
+%% A loader must implement is_usable/0. This callback is so that
+%% loaders that are only useful in certain environments (say, a
+%% memcached-backed loader) are not used.
+%%
+%% For instance, this function could test to see if ?BASE_URL's host
+%% is reachable.
+is_usable() -> true.
 
-    %% A loader must implement load_template_source/1 and
-    %% load_template_source/2. This is to match the Django API, where a
-    %% `dirs' argument must be accepted even for loaders that are not
-    %% concerned with this detail.
-    %%
-    %% This function should return a {ok, Content, DisplayName} triple
-    %% where Content is the template string and DisplayName is a name
-    %% for the found template, which will be used in debugging outputs.
-    %%
-    %% It should return {error, not_found} if the template is not found.
-    %% Any other error return will immediately halt the lookup process.
-    load_template_source(Name) -> load_template_source(Name, []).
-    load_template_source(Name, _Dirs) ->
-        %% Assume our application has already started `inets'.
-        Url = ?BASE_URL ++ Name,
-        %% Anything other than a 200 response is "not found".
-        case httpc:request(Url) of
-            {ok, {_Proto, 200, _Msg}, _Headers, Body} ->
-                {ok, Body, Url};
-            _ -> {error, not_found};
-        end.
+%% A loader must implement load_template_source/1 and
+%% load_template_source/2. This is to match the Django API, where a
+%% `dirs' argument must be accepted even for loaders that are not
+%% concerned with this detail.
+%%
+%% This function should return a {ok, Content, DisplayName} triple
+%% where Content is the template string and DisplayName is a name
+%% for the found template, which will be used in debugging outputs.
+%%
+%% It should return {error, not_found} if the template is not found.
+%% Any other error return will immediately halt the lookup process.
+load_template_source(Name) -> load_template_source(Name, []).
+load_template_source(Name, _Dirs) ->
+    %% Assume our application has already started `inets'.
+    Url = ?BASE_URL ++ Name,
+    %% Anything other than a 200 response is "not found".
+    case httpc:request(Url) of
+        {ok, {_Proto, 200, _Msg}, _Headers, Body} ->
+            {ok, Body, Url};
+        _ -> {error, not_found};
+    end.
+```
 
 
 ##9. Custom Tags and Filters
@@ -376,36 +398,38 @@ in the sections below.
     a `dtl_node:tnode()`. This may be a `dtl_node:unode()`, a list, or a
     binary.
 
-    -behaviour(dtl_library).
-    -export([registered_filters/0,
-             registered_tags/0,
-             color_orange/2,
-             render_color_orange/2]).
+```erlang
+-behaviour(dtl_library).
+-export([registered_filters/0,
+         registered_tags/0,
+         color_orange/2,
+         render_color_orange/2]).
 
-    registered_filters() -> [].
-    regisered_tags() -> [color_orange].
+registered_filters() -> [].
+regisered_tags() -> [color_orange].
 
-    %% This function extracts the number of repititions from the tag
-    %% token and saves this in the new node's state.
-    %%
-    %% {% color_orange 1 %} Hello {% endcolor_orange %} ->
-    %% <div class="orange"> Hello </div>
-    color_orange(Parser, Token) ->
-        [<<NBin/binary>>] = dtl_token:split_contents(Token),
-        N = list_to_integer(binary_to_list(NBin)),
-        {Nodes, Parser2} = dtl_parser:parse("endcolor_orange"),
-        Node = dtl_node:new("color_orange", {?MODULE, render_color_orange}),
-        Node2 = dtl_node:set_nodelist(Node, Nodes),
-        Node3 = dtl_node:set_state(Node2, N),
-        {Node3, dtl_parser:delete_first_token(Parser2)}.
+%% This function extracts the number of repititions from the tag
+%% token and saves this in the new node's state.
+%%
+%% {% color_orange 1 %} Hello {% endcolor_orange %} ->
+%% <div class="orange"> Hello </div>
+color_orange(Parser, Token) ->
+    [<<NBin/binary>>] = dtl_token:split_contents(Token),
+    N = list_to_integer(binary_to_list(NBin)),
+    {Nodes, Parser2} = dtl_parser:parse("endcolor_orange"),
+    Node = dtl_node:new("color_orange", {?MODULE, render_color_orange}),
+    Node2 = dtl_node:set_nodelist(Node, Nodes),
+    Node3 = dtl_node:set_state(Node2, N),
+    {Node3, dtl_parser:delete_first_token(Parser2)}.
 
-    %% Renders the tag contents N times inside an orange block.
-    render_color_orange(Node, Ctx) ->
-        N = dtl_node:state(Node),
-        Nodes = dtl_node:nodelist(Node),
-        ["<div class=\"orange\">",
-            [dtl_node:render_list(Nodes) || X <- lists:seq(1, N)],
-         "</div>"].
+%% Renders the tag contents N times inside an orange block.
+render_color_orange(Node, Ctx) ->
+    N = dtl_node:state(Node),
+    Nodes = dtl_node:nodelist(Node),
+    ["<div class=\"orange\">",
+        [dtl_node:render_list(Nodes) || X <- lists:seq(1, N)],
+     "</div>"].
+```
 
 `{{dtl_tag, inclusion_tag, TemplateName}, ContextFunction}`: This is an
     example of a tag wrapper, which may be provided as a `{module(),
@@ -416,39 +440,44 @@ in the sections below.
     receives any arguments passed to the inclusion tag as positional and
     keyword argument lists.
 
-    -behaviour(dtl_library).
-    -export([registered_filters/0,
-             registered_tags/0,
-             pretty_box/2]).
-    registered_filters() -> [].
-    regisered_tags() -> [{{dtl_tag, inclusion_tag, "pretty-box.html"}, pretty_box}].
+```erlang
+-behaviour(dtl_library).
+-export([registered_filters/0,
+         registered_tags/0,
+         pretty_box/2]).
+registered_filters() -> [].
+regisered_tags() -> [{{dtl_tag, inclusion_tag, "pretty-box.html"}, pretty_box}].
 
-    %%%% pretty-box.html:
-    %% <div class="so" style="color: {{ color }}">
-    %%   <div class="many">
-    %%     <div class="lovely">
-    %%       <div class="elements">
-    %%         <h1>{{ title }}</h1>
-    %%       </div>
-    %%     </div>
-    %%   </div>
-    %% </div>
+%%%% pretty-box.html:
+%% <div class="so" style="color: {{ color }}">
+%%   <div class="many">
+%%     <div class="lovely">
+%%       <div class="elements">
+%%         <h1>{{ title }}</h1>
+%%       </div>
+%%     </div>
+%%   </div>
+%% </div>
 
-    %% Renders a pretty box with the provided title and optional color.
-    %%     {% pretty_box "March" color="#f90" %}
-    pretty_box([Title], Options) ->
-        Color = proplists:get_value(color, Options, "#fc0"),
-        [{color, Color},
-         {title, Title}].
+%% Renders a pretty box with the provided title and optional color.
+%%     {% pretty_box "March" color="#f90" %}
+pretty_box([Title], Options) ->
+    Color = proplists:get_value(color, Options, "#fc0"),
+    [{color, Color},
+     {title, Title}].
+```
 
-Simple tag is not needed for most cases, where the custom tag can choose
-to simply return a list or binary (see `dtl_node:tnode()` definition).
-Use something like the following for a named simple tag:
+Simple tag works for most cases, where the custom tag returns a list or binary.
+The following is a named simple tag:
 
-    my_simple_tag(Parser, _Token) ->
-        {ok, dtl_node("my_simple_tag", fun (Node, Ctx) ->
-             %% Render ...
-         end, Parser)}.
+```erlang
+my_simple_tag(Parser, _Token) ->
+    {ok, dtl_node("my_simple_tag", fun (Node, Ctx) ->
+         %% Render ...
+     end, Parser)}.
+```
+
+See `dtl_default_library` and `dtl_tag_tests` for more examples.
 
 
 ##9.2. Custom Filters
@@ -457,24 +486,25 @@ Custom filters are functions that can accept a list of colon-separated
 arguments. They must return a tagged list, binary, or iolist, in the
 form `{ok, Out}`:
 
-    -behaviour(dtl_library).
-    -export([registered_filters/0,
-             registered_tags/0]).
-    %% Filters.
-    -export([add/2,
-             reverso/1]).
+```erlang
+-behaviour(dtl_library).
+-export([registered_filters/0,
+         registered_tags/0]).
+%% Filters.
+-export([add/2,
+         reverso/1]).
 
-    registered_filters() -> [reverso].
-    regisered_tags() -> [].
+registered_filters() -> [reverso].
+regisered_tags() -> [].
 
-    %% @doc Reverses its input: {{ "Cat"|reverso }} -> "taC".
-    reverso(Bin) ->
-        {ok, list_to_binary(lists:reverse(binary_to_list(Text)))}.
+%% @doc Reverses its input: {{ "Cat"|reverso }} -> "taC".
+reverso(Bin) ->
+    {ok, list_to_binary(lists:reverse(binary_to_list(Text)))}.
 
-    %% @doc Adds to the first number: {{ 1|add:2 }} -> "3".
-    add(X, [Y]) ->
-        {ok, integer_to_list(X + Y)}.
-
+%% @doc Adds to the first number: {{ 1|add:2 }} -> "3".
+add(X, [Y]) ->
+    {ok, integer_to_list(X + Y)}.
+```
 
 ##10. Getting Help
 
