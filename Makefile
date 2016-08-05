@@ -86,6 +86,9 @@ clean: check-clean doc-clean
 	$(REBAR) clean skip_deps=true
 	$(MAKE) -C $(TEST_APP) clean
 
+clean-deps:
+	rm -rf .rebar deps
+
 check-clean:
 	rm -rf logs
 
