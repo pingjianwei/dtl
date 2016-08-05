@@ -1,5 +1,9 @@
 language: erlang
-script: "make deps && make check"
+
+script:
+    - make deps
+    - make check
+
 otp_release:
     - R15B
     - R15B01
@@ -14,3 +18,5 @@ otp_release:
     - 18.0
     - 18.1
     - 18.2
+    - 18.3
+    - 19.0
