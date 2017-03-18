@@ -4,7 +4,7 @@
 
 A full-featured port of the Django template engine to Erlang.
 
-Tested and supported for Erlang/OTP versions R15B-19.2.
+Tested and supported for Erlang/OTP versions R15B-19.3.
 
 API Documentation: [http://oinksoft.github.io/dtl/](http://oinksoft.github.io/dtl/)
 
