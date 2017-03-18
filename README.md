@@ -1,4 +1,4 @@
-#Django Template Language
+# Django Template Language
 
 [![Travis CI](https://api.travis-ci.org/oinksoft/dtl.png?branch=master)](https://travis-ci.org/oinksoft/dtl)
 
@@ -21,7 +21,7 @@ API Documentation: [http://oinksoft.github.io/dtl/](http://oinksoft.github.io/dt
 11. [Roadmap](#11-roadmap)
 
 
-##1. Introduction
+## 1. Introduction
 
 This project is an effort to fully implement the Django template engine
 in Erlang. I hope to create a feature-complete port, using the same data
@@ -29,7 +29,7 @@ types and striving for parity with the Python API and the base
 filter/tag set included in Django.
 
 
-##2. Installation
+## 2. Installation
 
 To install the latest version, add this to your dependency list in
 rebar.config:
@@ -54,7 +54,7 @@ allows DTL to have some optimizations in the future via its own
 services.
 
 
-##3. Configuration
+## 3. Configuration
 
 These are the application-wide environment variables. Set them like you
 do any other application options.
@@ -83,7 +83,7 @@ settings module if you need this functionality and still be aware of
 potential race conditions.
 
 
-###3.1 Settings Modules
+### 3.1 Settings Modules
 
 _Most users won't need to use this. The default settings module (application
 env) is suitable for most uses._
@@ -115,7 +115,7 @@ You can see another example with `dtl_ets_settings`, which is only used
 for DTL tests.
 
 
-##4. Basic usage
+## 4. Basic usage
 
 See [6. Context and Context Processors](#6-context-and-context-processors)
 for information on setting context variables in your templates, and
@@ -167,14 +167,14 @@ Tpl = dtl_loader:select_template(["index.html", "index.htm"]),
 {ok, Html} = dtl_template:render(Tpl),
 ```
 
-##5. Syntax
+## 5. Syntax
 
 Template syntax is identical to that of the [Django template
 language](https://docs.djangoproject.com/en/dev/topics/templates/).
 Please report any observable differences as bugs.
 
 
-##6. Context and Context Processors
+## 6. Context and Context Processors
 
 Contexts are the primary means of transmitting data from application
 code to Django templates. Any value that is accessible on a context
@@ -195,7 +195,7 @@ a context explicitly as in the last example:
 {ok, Bin} = dtl:render(Tpl, #{foo => "Foo", bar => "Bar"}).
 ```
 
-###6.1. Context Processors
+### 6.1. Context Processors
 
 A user may specify a list of {Mod, Fun} tuples which will be called, in
 order, when initializing a new context. Each function should return a
@@ -220,7 +220,7 @@ application:set_env(dtl, context_processors, [{my_app, process_time}]).
 Now, a template could access `time` and `date` variables.
 
 
-##7. Built-in Tags and Filters
+## 7. Built-in Tags and Filters
 
 The target is to implement all default template tags and filters. Below are tables showing the current development status of these items.
 
@@ -228,7 +228,7 @@ Documentation on how to use these tags and filters can be found at
 https://docs.djangoproject.com/en/dev/ref/templates/builtins/
 
 
-###7.1 Tags
+### 7.1 Tags
 
 Name|Implemented
 ---|---
@@ -260,7 +260,7 @@ Name|Implemented
 `with`|No
 
 
-###7.2 Filters
+### 7.2 Filters
 
 Name|Implemented
 ---|---
@@ -323,7 +323,7 @@ Name|Implemented
 `yesno`|No
 
 
-##8. Loader Modules
+## 8. Loader Modules
 
 DTL comes with two template loader modules, which are described here:
 
@@ -382,7 +382,7 @@ load_template_source(Name, _Dirs) ->
 ```
 
 
-##9. Custom Tags and Filters
+## 9. Custom Tags and Filters
 
 Custom tags and filters are defined in a "Library," which is a simple
 callback module that implements the `dtl_library` behaviour. A library
@@ -390,7 +390,7 @@ simply defines `registered_tags/0` and `registered_filters/0`, each of
 which return a list of function names, the likes of which are described
 in the sections below.
 
-##9.1. Custom Tags
+## 9.1. Custom Tags
 
 `registered_tags` returns a list of `dtl_library:tag_spec()`:
 
@@ -480,7 +480,7 @@ my_simple_tag(Parser, _Token) ->
 See `dtl_default_library` and `dtl_tag_tests` for more examples.
 
 
-##9.2. Custom Filters
+## 9.2. Custom Filters
 
 Custom filters are functions that can accept a list of colon-separated
 arguments. They must return a tagged list, binary, or iolist, in the
@@ -506,13 +506,13 @@ add(X, [Y]) ->
     {ok, integer_to_list(X + Y)}.
 ```
 
-##10. Getting Help
+## 10. Getting Help
 
 Please report issues at
 [the Github issue queue](https://github.com/oinksoft/dtl/issues).
 
 
-##11. Roadmap
+## 11. Roadmap
 
 * Default tags and filters.
 * Performance optimizations (cache parsed templates in ETS, etc.).
