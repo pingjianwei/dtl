@@ -2,40 +2,33 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Module dtl_lexer</title>
+<title>Module dtl_compat</title>
 <link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
 </head>
 <body bgcolor="white">
 <div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
 <hr>
 
-<h1>Module dtl_lexer</h1>
-<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Template tokenizing functions.
+<h1>Module dtl_compat</h1>
+<ul class="index"><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
 
 
-<h2><a name="description">Description</a></h2>Template tokenizing functions.
 <h2><a name="types">Data Types</a></h2>
 
-<h3 class="typedecl"><a name="type-token">token()</a></h3>
-<p><tt>token() = {<a href="#type-token_type">token_type()</a>, binary()}</tt></p>
-
-
-<h3 class="typedecl"><a name="type-token_type">token_type()</a></h3>
-<p><tt>token_type() = text | var | block | comment</tt></p>
+<h3 class="typedecl"><a name="type-compat_dict">compat_dict()</a></h3>
+<p><tt>compat_dict() = <a href="dict.html#type-dict">dict:dict()</a></tt></p>
 
 
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#tokenize-1">tokenize/1</a></td><td>Traverses the provided template source code, generating a list
-       of tokens describing the basic structure.</td></tr>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#float_to_list-2">float_to_list/2</a></td><td></td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
 
-<h3 class="function"><a name="tokenize-1">tokenize/1</a></h3>
+<h3 class="function"><a name="float_to_list-2">float_to_list/2</a></h3>
 <div class="spec">
-<p><tt>tokenize(Src::binary()) -&gt; [<a href="#type-token">token()</a>]</tt><br></p>
-</div><p>Traverses the provided template source code, generating a list
-       of tokens describing the basic structure.</p>
+<p><tt>float_to_list(F, Opts) -&gt; any()</tt></p>
+</div>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>

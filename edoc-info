@@ -1,7 +1,6 @@
 %% encoding: UTF-8
-{packages,[]}.
-{modules,[dtl,dtl_app_config_settings,dtl_apps_loader,dtl_context,
+{modules,[dtl,dtl_app_config_settings,dtl_apps_loader,dtl_compat,dtl_context,
           dtl_debug_lexer,dtl_debug_parser,dtl_default_library,
           dtl_ets_settings,dtl_file,dtl_filter,dtl_fs_loader,dtl_lexer,
           dtl_library,dtl_loader,dtl_node,dtl_parser,dtl_settings,dtl_string,
-          dtl_tag,dtl_template]}.
+          dtl_support,dtl_tag,dtl_template]}.
