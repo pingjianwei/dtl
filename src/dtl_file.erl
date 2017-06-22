@@ -60,7 +60,7 @@ abspath_resolve([], Acc) ->
 %%      first.
 -spec safe_path(list(), list()) -> list() | undefined.
 safe_path(Path, Root) ->
-    case string:str(abspath(Path), abspath(Root)) of
-        0 -> undefined;
-        _ -> Path
+    case dtl_string:contains(abspath(Path), abspath(Root)) of
+        true -> Path;
+        false -> undefined
     end.

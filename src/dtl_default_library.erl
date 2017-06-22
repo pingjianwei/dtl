@@ -203,7 +203,7 @@ escapejs(Bin) ->
 -spec join(any(), binary()) -> {ok, binary()}.
 join(L, Sep) when is_list(L) ->
     Parts = [binary_to_list(dtl_node:var_to_binary(E)) || E <- L],
-    {ok, list_to_binary(string:join(Parts, binary_to_list(Sep)))};
+    {ok, list_to_binary(dtl_string:join(Parts, binary_to_list(Sep)))};
 join(undefined, _) ->
     {ok, <<>>};
 join(_, _) ->
@@ -703,7 +703,7 @@ for(Parser, Token) ->
 
 do_for(From, RawVars, Reversed, Parser) ->
     VarNames = [binary_to_list(V) || V <- lists:reverse(RawVars)],
-    Vars = re:split(string:join(VarNames, " "), " *, *",
+    Vars = re:split(dtl_string:join(VarNames, " "), " *, *",
                     [{return, binary}]),
     %% Django validates that arguments do not contain spaces or are
     %% empty strings here.
