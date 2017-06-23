@@ -153,7 +153,7 @@ process_var(Num = <<C, _/binary>>) when C >= $0, C =< $9;
                                         C =:= $- ->
     process_term(Num);
 process_var(Var) ->
-    string:tokens(binary_to_list(Var), ?VARIABLE_SEP).
+    dtl_string:tokens(binary_to_list(Var), ?VARIABLE_SEP).
 
 -spec resolve_expr(expr(), dtl_context:context()) ->
     {ok, term(), dtl_node:escape_spec()}.

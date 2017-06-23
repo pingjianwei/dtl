@@ -28,7 +28,12 @@
          escape_re/1,
          safe_list_to_atom/1,
          safe_list_to_number/1,
-         smart_split/1]).
+         smart_split/1,
+
+         %% Replacements for functions removed in OTP 21
+         contains/2,
+         join/2,
+         tokens/2]).
 
 %% Regex for splitting block tag tokens.
 -define(TOKEN_PART_MATCHER,
@@ -127,3 +132,19 @@ safe_list_to_number(L) ->
             error
         end
     end.
+
+%% Replacements for functions removed in OTP 21 (contains/2 replaces str/2 =:= 0).
+
+-ifdef(deprecated_string_funcs_20).
+
+contains(S, Sub) -> string:find(S, Sub) =/= nomatch.
+join(L, Sep) -> lists:join(Sep, L).
+tokens(L, Seps) -> string:lexemes(L, Seps).
+
+-else.
+
+contains(S, Sub) -> string:str(S, Sub) > 0.
+join(L, Sep) -> string:join(L, Sep).
+tokens(L, Seps) -> string:tokens(L, Seps).
+
+-endif.
