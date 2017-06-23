@@ -18,8 +18,7 @@ API Documentation: [http://oinksoft.github.io/dtl/](http://oinksoft.github.io/dt
 7. [Built-in Tags and Filters](#7-built-in-tags-and-filters)
 8. [Loader Modules](#8-loader-modules)
 9. [Custom Tags and Filters](#9-custom-tags-and-filters)
-10. [Getting Help](#10-supportgetting-help)
-11. [Roadmap](#11-roadmap)
+10. [Getting Help](#10-getting-help)
 
 
 ## 1. Introduction
