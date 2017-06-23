@@ -511,12 +511,3 @@ add(X, [Y]) ->
 
 Please report issues at
 [the Github issue queue](https://github.com/oinksoft/dtl/issues).
-
-
-## 11. Roadmap
-
-* Default tags and filters.
-* Performance optimizations (cache parsed templates in ETS, etc.).
-* Debug lexer and parser, better error handling.
-* I18n support.
-* OTP version?
